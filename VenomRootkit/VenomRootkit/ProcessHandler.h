@@ -1,3 +1,7 @@
 #pragma once
-#include <ntddk.h>
-NTSTATUS UnlinkActiveProcessLinks(ULONG pid);
+#include <Ntifs.h>
+
+namespace ProcessHandler {
+
+	NTSTATUS UnlinkActiveProcessLinks(ULONG pid);
+}

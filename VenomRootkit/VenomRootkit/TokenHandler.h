@@ -1,2 +1,5 @@
 #pragma once
-void ReplaceToken(PEPROCESS Process, PACCESS_TOKEN Token);
+#include <Ntifs.h>
+namespace TokenHandler {
+	void ReplaceToken(PEPROCESS Process, PACCESS_TOKEN Token);
+}

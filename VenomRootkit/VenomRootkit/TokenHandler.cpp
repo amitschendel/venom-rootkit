@@ -1,7 +1,8 @@
-#include <ntifs.h>
-#include <ntddk.h>
+#pragma warning( disable : 4311 4302 )
+#include "TokenHandler.h"
+//#include <ntddk.h>
 
-void ReplaceToken(PEPROCESS Process, PACCESS_TOKEN Token) {
+void TokenHandler::ReplaceToken(PEPROCESS Process, PACCESS_TOKEN Token) {
 	PACCESS_TOKEN SystemToken;
 	PULONG ptr;
 
