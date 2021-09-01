@@ -18,7 +18,8 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
-	ULONG PID = 6540;
+	ULONG PID = 5048;
+	std::cout << "The pid is: " << PID;
 	DWORD returned = 0;
 	BOOL success = DeviceIoControl(hDevice, (DWORD)VenomIoctls::Elevate, &PID, sizeof(PID), nullptr, 0, &returned, nullptr);
 

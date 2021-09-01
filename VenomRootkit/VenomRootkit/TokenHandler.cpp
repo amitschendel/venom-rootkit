@@ -14,6 +14,7 @@ void TokenHandler::ReplaceToken(PEPROCESS Process, PACCESS_TOKEN Token) {
 	{
 		if ((ptr[i] & ~7) == (ULONG)((ULONG)Token & ~7))
 		{
+			DbgPrint("Replaceing token");
 			ptr[i] = (ULONG)SystemToken; // Replace the orginal token with system token.
 			break;
 		}

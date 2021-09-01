@@ -150,14 +150,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IoctlHandlers.cpp" />
+    <ClCompile Include="sayHi.cpp" />
     <ClCompile Include="TokenHandler.cpp" />
     <ClCompile Include="Venom.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ioctl.h" />
     <ClInclude Include="IoctlHandlers.h" />
-    <ClInclude Include="ProcessHandler.cpp" />
-    <ClInclude Include="ProcessHandler.h" />
+    <ClInclude Include="ProcHandler.cpp" />
+    <ClInclude Include="ProcHandler.h" />
+    <ClInclude Include="sayHi.h" />
     <ClInclude Include="TokenHandler.h" />
     <ClInclude Include="Venom.h" />
   </ItemGroup>

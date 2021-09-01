@@ -1,6 +1,6 @@
-#include "ProcessHandler.h"
+#include "ProcHandler.h"
 
-NTSTATUS ProcessHandler::UnlinkActiveProcessLinks(ULONG pid) {
+NTSTATUS ProcHandler::UnlinkActiveProcessLinks(ULONG pid) {
 	NTSTATUS status;
 	PEPROCESS EProc;
 	PLIST_ENTRY PrevListEntry, NextListEntry, CurrListEntry;
@@ -54,5 +54,4 @@ NTSTATUS ProcessHandler::UnlinkActiveProcessLinks(ULONG pid) {
 
 	status = STATUS_SUCCESS;
 	return status;
-
 }
