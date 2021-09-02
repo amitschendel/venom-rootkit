@@ -28,7 +28,10 @@
     <ClCompile Include="TokenHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sayHi.cpp">
+    <ClCompile Include="NetworkHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FastMutex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -51,7 +54,13 @@
     <ClInclude Include="ProcHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sayHi.h">
+    <ClInclude Include="NetworkHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FastMutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoLock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
