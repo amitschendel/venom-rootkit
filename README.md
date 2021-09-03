@@ -3,7 +3,7 @@ A simple windows rootkit.
 
 # Features
 
-- [ ] Process Hiding.
-- [x] Token elevation to "nt authority system".
+- [x] Process Hiding.
+- [x] Token elevation to "NT AUTHORITY\SYSTEM".
 - [ ] Command execution.
-- [ ] TCP connection hiding.
+- [x] TCP port hiding by hooking NSI.

