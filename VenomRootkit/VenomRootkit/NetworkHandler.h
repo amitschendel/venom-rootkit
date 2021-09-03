@@ -56,33 +56,31 @@ namespace NetworkHandler {
 
 	typedef unsigned long DWORD;
 
+	constexpr int TCP = 0x38;
+
 	typedef struct _NSI_STATUS_ENTRY
 	{
-		char bytesfill[12];
-
-	} NSI_STATUS_ENTRY, * PNSI_STATUS_ENTRY;
+		DWORD dwState;
+		DWORD Unknown1;
+	}NSI_STATUS_ENTRY, * PNSI_STATUS_ENTRY;
 
 	typedef struct _NSI_PARAM
 	{
-
-		DWORD UnknownParam1;
-		DWORD UnknownParam2;
-		DWORD UnknownParam3;
-		DWORD UnknownParam4;
-		DWORD UnknownParam5;
-		DWORD UnknownParam6;
-		PVOID lpMem;
-		DWORD UnknownParam8;
-		DWORD UnknownParam9;
-		DWORD UnknownParam10;
-		PNSI_STATUS_ENTRY lpStatus;
-		DWORD UnknownParam12;
-		DWORD UnknownParam13;
-		DWORD UnknownParam14;
-		DWORD TcpConnectionCount;
-
-
-	} NSI_PARAM, * PNSI_PARAM;
+		ULONG_PTR UnknownParam1;
+		ULONG_PTR UnknownParam2;
+		ULONG_PTR UnknownParam3;
+		ULONG_PTR UnknownParam4;
+		ULONG_PTR UnknownParam5;
+		ULONG_PTR lpMem;
+		ULONG_PTR Protocol; // 0x38 Tcp or 0x1c Udp
+		ULONG_PTR UnknownParam8;
+		ULONG_PTR UnknownParam9;
+		ULONG_PTR lpStatus;
+		ULONG_PTR UnknownParam11;
+		ULONG_PTR UnknownParam12; //Process info
+		ULONG_PTR UnknownParam13;
+		ULONG_PTR ConnectionCount;
+	}NSI_PARAM, * PNSI_PARAM;
 
 	typedef struct _HP_CONTEXT
 	{
@@ -94,12 +92,11 @@ namespace NetworkHandler {
 
 	typedef struct _INTERNAL_TCP_TABLE_SUBENTRY
 	{
-		char bytesfill0[2];
+		USHORT Unknown1;
 		USHORT Port;
 		DWORD dwIP;
-		char bytesfill[20];
-
-	} INTERNAL_TCP_TABLE_SUBENTRY, * PINTERNAL_TCP_TABLE_SUBENTRY;
+		UCHAR Unknown2[20];
+	}INTERNAL_TCP_TABLE_SUBENTRY, * PINTERNAL_TCP_TABLE_SUBENTRY;
 
 	typedef struct _INTERNAL_TCP_TABLE_ENTRY
 	{
