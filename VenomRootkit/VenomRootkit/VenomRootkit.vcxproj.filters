@@ -34,6 +34,9 @@
     <ClCompile Include="FastMutex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ProcHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Venom.h">
@@ -47,9 +50,6 @@
     </ClInclude>
     <ClInclude Include="TokenHandler.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ProcHandler.cpp">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="ProcHandler.h">
       <Filter>Header Files</Filter>

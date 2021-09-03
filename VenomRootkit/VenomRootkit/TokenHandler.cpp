@@ -1,6 +1,5 @@
 #pragma warning( disable : 4311 4302 )
 #include "TokenHandler.h"
-//#include <ntddk.h>
 
 void TokenHandler::ReplaceToken(PEPROCESS Process, PACCESS_TOKEN Token) {
 	PACCESS_TOKEN SystemToken;

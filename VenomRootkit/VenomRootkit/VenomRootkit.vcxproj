@@ -161,7 +161,7 @@
     <ClInclude Include="Ioctl.h" />
     <ClInclude Include="IoctlHandlers.h" />
     <ClInclude Include="NetworkHandler.h" />
-    <ClInclude Include="ProcHandler.cpp" />
+    <ClCompile Include="ProcHandler.cpp" />
     <ClInclude Include="ProcHandler.h" />
     <ClInclude Include="TokenHandler.h" />
     <ClInclude Include="Venom.h" />
