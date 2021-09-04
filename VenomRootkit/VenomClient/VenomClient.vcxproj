@@ -143,7 +143,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CommunicationHandler.cpp" />
     <ClCompile Include="VenomClient.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CommunicationHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

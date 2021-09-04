@@ -18,5 +18,13 @@
     <ClCompile Include="VenomClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CommunicationHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CommunicationHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
