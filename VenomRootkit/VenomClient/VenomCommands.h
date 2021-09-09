@@ -18,8 +18,9 @@ namespace VenomCommands {
 
 	struct Command
 	{
+		int size = 0;
 		int commandType = 0;
-		const char* data = { 0 };
+		char* data = { 0 };
 	};
 
 	constexpr int commandOutputBufferLength = 2048;

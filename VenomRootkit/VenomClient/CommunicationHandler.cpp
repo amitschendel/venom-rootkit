@@ -40,23 +40,21 @@ void CommunicationHandler::Communicator::sendTelemetry()
 	// Need to implement.
 }
 
-bool CommunicationHandler::Communicator::pullCommand(char* buffer, size_t bufferLength)
+bool CommunicationHandler::Communicator::pullCommand(VenomCommands::Command *recievedCommand)
 {
-	int resultStatus = 0;
+	// Get data buffer size.
+	recv(connectionSocket, (char *)recievedCommand->size, sizeof(int), 0);
 
-	do {
+	if (recievedCommand->size > 0)
+	{
+		// Get the command type.
+		recv(connectionSocket, (char*)recievedCommand->commandType, sizeof(int), 0);
 
-		resultStatus = recv(connectionSocket, buffer, (int)bufferLength, 0);
-		if (resultStatus < 0)
-			goto Error;
-
-	} while (resultStatus > 0);
+		// Get the actual data.
+		recv(connectionSocket, recievedCommand->data, recievedCommand->size, 0);
+	}
 
 	return STATUS_SUCCESS;
-
-	Error:
-		// Add a log message with explenation.
-		return STATUS_FAILURE;
 }
 
 bool CommunicationHandler::Communicator::sendDataToCnc(const char* buffer)
