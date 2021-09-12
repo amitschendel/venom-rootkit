@@ -3,7 +3,7 @@
 
 bool UMInjectionHandler::shouldSkipThread(PETHREAD pThread, BOOLEAN isWow64)
 {
-    PUCHAR pTeb64 = (PUCHAR)PsGetThreadTeb(pThread);
+    PUCHAR pTeb64 = reinterpret_cast<PUCHAR>(PsGetThreadTeb(pThread));
     if (!pTeb64)
         return TRUE;
 
@@ -83,7 +83,7 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
         }
     }
 
-    BOOLEAN wow64 = PsGetProcessWow64Process(pProcess) != NULL;
+    //BOOLEAN wow64 = PsGetProcessWow64Process(pProcess) != NULL;
 
     // Reference target thread
     if (NT_SUCCESS(status))
@@ -104,12 +104,13 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
             status = PsLookupThreadByThreadId(pInfo->Threads[i].ClientId.UniqueThread, ppThread);
 
             // Skip specific threads
-            if (*ppThread && shouldSkipThread(*ppThread, wow64))
+            //
+            /*if (*ppThread && shouldSkipThread(*ppThread, wow64))
             {
                 ObDereferenceObject(*ppThread);
                 *ppThread = NULL;
                 continue;
-            }
+            }*/
 
             break;
         }
@@ -143,7 +144,7 @@ NTSTATUS UMInjectionHandler::injectDll(ULONG pid)
     if (!NT_SUCCESS(status))
         return status;
 
-    /*PKAPC apc = (PKAPC)ExAllocatePoolWithTag(NonPagedPool, sizeof(KAPC), DRIVER_TAG);
+    PKAPC apc = (PKAPC)ExAllocatePoolWithTag(NonPagedPool, sizeof(KAPC), DRIVER_TAG);
 
     if (!apc) {
         KdPrint(("[-] Could not queue a kernel APC due to insufficient memory.\n"));
@@ -176,6 +177,6 @@ NTSTATUS UMInjectionHandler::injectDll(ULONG pid)
             KdPrint(("[-] Could not insert a kernel APC.\n"));
             return STATUS_INTERNAL_ERROR;
         }
-    }*/
+    }
     return STATUS_SUCCESS;
 }

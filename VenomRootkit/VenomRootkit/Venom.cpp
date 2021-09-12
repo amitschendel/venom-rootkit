@@ -50,7 +50,7 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	}
 
 	::ExInitializeRundownProtection(&ApcHandler::g_rundown_protection);
-	ULONG pid = 1624;
+	ULONG pid = 504;
 	status = UMInjectionHandler::injectDll(pid);
 	if (!NT_SUCCESS(status)) {
 		return status;

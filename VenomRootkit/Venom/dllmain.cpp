@@ -9,8 +9,9 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        MessageBoxA(nullptr, "Hiiiiiii has been called.", "Hi!", 0);
+        MessageBox(nullptr, TEXT("Hiiiiiii has been called."), TEXT("Hi!"), 0);
     case DLL_THREAD_ATTACH:
+        //MessageBoxA(nullptr, "Hiiiiiii has been called.", "Hi!", 0);
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH:
         break;
