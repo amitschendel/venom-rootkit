@@ -149,22 +149,35 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ApcHandler.cpp" />
     <ClCompile Include="FastMutex.cpp" />
     <ClCompile Include="IoctlHandlers.cpp" />
     <ClCompile Include="NetworkHandler.cpp" />
+    <ClCompile Include="ShellcodeHandler.cpp" />
     <ClCompile Include="TokenHandler.cpp" />
+    <ClCompile Include="UMInjectionHandler.cpp" />
     <ClCompile Include="Venom.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ApcHandler.h" />
     <ClInclude Include="AutoLock.h" />
     <ClInclude Include="FastMutex.h" />
     <ClInclude Include="Ioctl.h" />
     <ClInclude Include="IoctlHandlers.h" />
+    <ClInclude Include="NativeStructs.h" />
     <ClInclude Include="NetworkHandler.h" />
     <ClCompile Include="ProcHandler.cpp" />
     <ClInclude Include="ProcHandler.h" />
+    <ClInclude Include="ShellcodeHandler.h" />
     <ClInclude Include="TokenHandler.h" />
+    <ClInclude Include="UMInjectionHandler.h" />
     <ClInclude Include="Venom.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="shellcode.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </MASM>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

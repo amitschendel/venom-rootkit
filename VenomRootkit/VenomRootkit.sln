@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VenomRootkit", "VenomRootki
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VenomClient", "VenomClient\VenomClient.vcxproj", "{4D69554F-B3A9-4ACA-9CB6-4B9EA747AA16}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Venom", "Venom\Venom.vcxproj", "{5FE1E82F-3468-4EA8-9645-937F17AF7213}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -55,6 +57,18 @@ Global
 		{4D69554F-B3A9-4ACA-9CB6-4B9EA747AA16}.Release|x64.Build.0 = Release|x64
 		{4D69554F-B3A9-4ACA-9CB6-4B9EA747AA16}.Release|x86.ActiveCfg = Release|Win32
 		{4D69554F-B3A9-4ACA-9CB6-4B9EA747AA16}.Release|x86.Build.0 = Release|Win32
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Debug|ARM.ActiveCfg = Debug|Win32
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Debug|x64.ActiveCfg = Debug|x64
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Debug|x64.Build.0 = Debug|x64
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Debug|x86.ActiveCfg = Debug|Win32
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Debug|x86.Build.0 = Debug|Win32
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Release|ARM.ActiveCfg = Release|Win32
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Release|ARM64.ActiveCfg = Release|Win32
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Release|x64.ActiveCfg = Release|x64
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Release|x64.Build.0 = Release|x64
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Release|x86.ActiveCfg = Release|Win32
+		{5FE1E82F-3468-4EA8-9645-937F17AF7213}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
