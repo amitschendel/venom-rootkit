@@ -83,7 +83,7 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
         }
     }
 
-    //BOOLEAN wow64 = PsGetProcessWow64Process(pProcess) != NULL;
+    BOOLEAN wow64 = PsGetProcessWow64Process(pProcess) != NULL;
 
     // Reference target thread
     if (NT_SUCCESS(status))
@@ -105,12 +105,16 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
 
             // Skip specific threads
             //
-            /*if (*ppThread && shouldSkipThread(*ppThread, wow64))
+            //if (*ppThread && shouldSkipThread(*ppThread, wow64))
+            if (*ppThread)
             {
-                ObDereferenceObject(*ppThread);
-                *ppThread = NULL;
-                continue;
-            }*/
+                if (wow64 || PsIsProtectedProcess(pProcess))
+                {
+                    ObDereferenceObject(*ppThread);
+                    *ppThread = NULL;
+                    continue;
+                }
+            }
 
             break;
         }

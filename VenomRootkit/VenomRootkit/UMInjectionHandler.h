@@ -10,6 +10,8 @@ namespace UMInjectionHandler {
 
 	EXTERN_C NTKERNELAPI PVOID NTAPI PsGetProcessWow64Process(PEPROCESS Process);
 
+	EXTERN_C NTKERNELAPI BOOLEAN NTAPI PsIsProtectedProcess(PEPROCESS Process);
+
 	EXTERN_C
 	NTSYSAPI
 		NTSTATUS

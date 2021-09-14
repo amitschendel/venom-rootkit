@@ -1,21 +1,24 @@
-// dllmain.cpp : Defines the entry point for the DLL application.
-#include "pch.h"
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-                     )
-{
-    switch (ul_reason_for_call)
-    {
+extern "C" __declspec(dllexport)
+DWORD WINAPI MessageBoxThread(LPVOID lpParam) {
+    MessageBox(NULL, TEXT("Hello world!"), TEXT("Hello World!"), NULL);
+    return 0;
+}
+
+extern "C" __declspec(dllexport)
+BOOL APIENTRY DllMain(HMODULE hModule,
+    DWORD ul_reason_for_call,
+    LPVOID lpReserved) {
+    switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
-        MessageBox(nullptr, TEXT("Hiiiiiii has been called."), TEXT("Hi!"), 0);
+        CreateThread(NULL, NULL, MessageBoxThread, NULL, NULL, NULL);
+        break;
     case DLL_THREAD_ATTACH:
-        //MessageBoxA(nullptr, "Hiiiiiii has been called.", "Hi!", 0);
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH:
         break;
     }
     return TRUE;
 }
-
