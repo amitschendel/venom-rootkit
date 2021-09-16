@@ -89,6 +89,12 @@ namespace ApcHandler {
 			_In_ PEPROCESS Process
 		);
 
+	extern "C"
+	BOOLEAN
+		KeTestAlertThread(
+			IN  KPROCESSOR_MODE AlertMode
+		);
+
 	void kernelFreeKapc(PKAPC apc, PKNORMAL_ROUTINE*, PVOID*, PVOID*, PVOID*);
 
 	void rundownFreeKapc(PKAPC apc);

@@ -1,6 +1,49 @@
 #include "UMInjectionHandler.h"
 #include "Venom.h"
 
+
+HANDLE UMInjectionHandler::getProcessId(UNICODE_STRING processName)
+{
+    auto status = STATUS_SUCCESS;
+    PVOID pBuf = ExAllocatePoolWithTag(NonPagedPool, 1024 * 1024, DRIVER_TAG);
+    PSYSTEM_PROCESS_INFO pInfo = (PSYSTEM_PROCESS_INFO)pBuf;
+
+    if (!pInfo)
+    {
+        DbgPrint("UMInjectionHandler: %s: Failed to allocate memory for process list\n", __FUNCTION__);
+        return 0;
+    }
+
+    status = ZwQuerySystemInformation(SystemProcessInformation, pInfo, 1024 * 1024, NULL);
+    if (!NT_SUCCESS(status))
+    {
+        ExFreePoolWithTag(pBuf, DRIVER_TAG);
+        return 0;
+    }
+
+    // Find target thread
+    if (NT_SUCCESS(status))
+    {
+        status = STATUS_NOT_FOUND;
+        for (;;)
+        {
+            DbgPrint("The image name is: %wZ", pInfo->ImageName);
+            if (RtlEqualUnicodeString(&pInfo->ImageName, &processName, TRUE))
+            {
+                DbgPrint("The pid is %p", pInfo->UniqueProcessId);
+                return pInfo->UniqueProcessId;
+                break;
+            }
+            else if (pInfo->NextEntryOffset)
+                pInfo = (PSYSTEM_PROCESS_INFO)((PUCHAR)pInfo + pInfo->NextEntryOffset);
+            else
+                break;
+        }
+    }
+
+    return 0;
+}
+
 bool UMInjectionHandler::shouldSkipThread(PETHREAD pThread, BOOLEAN isWow64)
 {
     PUCHAR pTeb64 = reinterpret_cast<PUCHAR>(PsGetThreadTeb(pThread));
@@ -53,7 +96,7 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
 
     if (!pInfo)
     {
-        DbgPrint("BlackBone: %s: Failed to allocate memory for process list\n", __FUNCTION__);
+        DbgPrint("UMInjectionHandler: %s: Failed to allocate memory for process list\n", __FUNCTION__);
         return STATUS_NO_MEMORY;
     }
 

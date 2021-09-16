@@ -43,12 +43,16 @@ void CommunicationHandler::Communicator::sendTelemetry()
 bool CommunicationHandler::Communicator::pullCommand(VenomCommands::Command *recievedCommand)
 {
 	// Get data buffer size.
-	recv(connectionSocket, (char *)recievedCommand->size, sizeof(int), 0);
+	char* size = { 0 };
+	recv(connectionSocket, size, sizeof(int), 0);
+	recievedCommand->size = atoi(size);
 
 	if (recievedCommand->size > 0)
 	{
 		// Get the command type.
-		recv(connectionSocket, (char*)recievedCommand->commandType, sizeof(int), 0);
+		char* commandType = { 0 };
+		recv(connectionSocket, commandType, sizeof(int), 0);
+		recievedCommand->commandType = atoi(commandType);
 
 		// Get the actual data.
 		recv(connectionSocket, recievedCommand->data, recievedCommand->size, 0);

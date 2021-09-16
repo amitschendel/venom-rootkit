@@ -29,6 +29,9 @@ namespace UMInjectionHandler {
 	// Gets the first valid thread for apc injection from the given process (Taken from BB Rootkit).
 	NTSTATUS getProcessThread(PEPROCESS pProcess, PETHREAD* ppThread);
 
+	// Find process id by name
+	HANDLE getProcessId(UNICODE_STRING processName);
+
 	NTSTATUS injectDll(ULONG pid);
 
 }

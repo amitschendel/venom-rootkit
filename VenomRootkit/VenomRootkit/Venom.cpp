@@ -49,12 +49,18 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 		return status;
 	}
 
+
+	UNICODE_STRING ProcessName = RTL_CONSTANT_STRING(L"explorer.exe");
+	HANDLE pid = UMInjectionHandler::getProcessId(ProcessName);
 	::ExInitializeRundownProtection(&ApcHandler::g_rundown_protection);
-	ULONG pid = 5232;
-	status = UMInjectionHandler::injectDll(pid);
+
+	DbgPrint("The pid is: %lu", HandleToUlong(pid));
+
+	status = UMInjectionHandler::injectDll(HandleToUlong(pid));
 	if (!NT_SUCCESS(status)) {
 		return status;
 	}
+
 
 	return STATUS_SUCCESS;
 }

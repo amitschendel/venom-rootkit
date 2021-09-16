@@ -130,6 +130,8 @@ void ApcHandler::normalInjectCode(PVOID, PVOID, PVOID)
 		0
 	);
 
+	KeTestAlertThread(UserMode);
+
 	if (!inserted) {
 		ExFreePoolWithTag(apc, DRIVER_TAG);
 		::ExReleaseRundownProtection(&g_rundown_protection);
