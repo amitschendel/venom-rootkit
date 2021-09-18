@@ -96,7 +96,6 @@ void ApcHandler::normalInjectCode(PVOID, PVOID, PVOID)
 	}
 
 	RtlCopyMemory(mapped_address, shellcodeHandler::injectedShellcode, sizeof(shellcodeHandler::injectedShellcode));
-	//::memcpy_s(mapped_address, sizeof(shellcodeHandler::injectedShellcode), shellcodeHandler::injectedShellcode, sizeof(shellcodeHandler::injectedShellcode));
 
 	::MmUnmapLockedPages(mapped_address, mdl);
 	::MmUnlockPages(mdl);

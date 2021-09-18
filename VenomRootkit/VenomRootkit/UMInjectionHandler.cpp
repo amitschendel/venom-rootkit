@@ -5,8 +5,7 @@
 HANDLE UMInjectionHandler::getProcessId(UNICODE_STRING processName)
 {
     auto status = STATUS_SUCCESS;
-    PVOID pBuf = ExAllocatePoolWithTag(NonPagedPool, 1024 * 1024, DRIVER_TAG);
-    PSYSTEM_PROCESS_INFO pInfo = (PSYSTEM_PROCESS_INFO)pBuf;
+    PSYSTEM_PROCESS_INFO pInfo = (PSYSTEM_PROCESS_INFO)ExAllocatePoolWithTag(NonPagedPool, 1024 * 1024, DRIVER_TAG);
 
     if (!pInfo)
     {
@@ -17,7 +16,7 @@ HANDLE UMInjectionHandler::getProcessId(UNICODE_STRING processName)
     status = ZwQuerySystemInformation(SystemProcessInformation, pInfo, 1024 * 1024, NULL);
     if (!NT_SUCCESS(status))
     {
-        ExFreePoolWithTag(pBuf, DRIVER_TAG);
+        ExFreePoolWithTag(pInfo, DRIVER_TAG);
         return 0;
     }
 

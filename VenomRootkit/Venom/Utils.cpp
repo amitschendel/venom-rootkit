@@ -11,5 +11,4 @@ std::string Utils::generateUUID()
     char* str;
     UuidToStringA(&uuid, (RPC_CSTR*)&str);
     return str;
-    //RpcStringFreeA((RPC_CSTR*)&str);
 }
