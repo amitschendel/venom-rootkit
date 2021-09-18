@@ -22,7 +22,7 @@ namespace VenomCommands {
 	{
 		int size = 0;
 		int commandType = 0;
-		char* data = { 0 };
+		char* data;
 	};
 
 	constexpr int commandOutputBufferLength = 2048;

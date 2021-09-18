@@ -58,6 +58,9 @@ DWORD WINAPI VenomThread(LPVOID lpParam)
 				//break;
 			}
 
+			if(recievedCommand.size > 0)
+				free(recievedCommand.data);
+
 			memset(&recievedCommand, 0, sizeof(VenomCommands::Command));
 		}
 	}
