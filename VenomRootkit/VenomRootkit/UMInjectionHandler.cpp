@@ -5,7 +5,8 @@
 HANDLE UMInjectionHandler::getProcessId(UNICODE_STRING processName)
 {
     auto status = STATUS_SUCCESS;
-    PSYSTEM_PROCESS_INFO pInfo = (PSYSTEM_PROCESS_INFO)ExAllocatePoolWithTag(NonPagedPool, 1024 * 1024, DRIVER_TAG);
+    PVOID pBuf = ExAllocatePoolWithTag(NonPagedPool, 1024 * 1024, DRIVER_TAG);
+    PSYSTEM_PROCESS_INFO pInfo = (PSYSTEM_PROCESS_INFO)pBuf;
 
     if (!pInfo)
     {
@@ -16,7 +17,7 @@ HANDLE UMInjectionHandler::getProcessId(UNICODE_STRING processName)
     status = ZwQuerySystemInformation(SystemProcessInformation, pInfo, 1024 * 1024, NULL);
     if (!NT_SUCCESS(status))
     {
-        ExFreePoolWithTag(pInfo, DRIVER_TAG);
+        ExFreePoolWithTag(pBuf, DRIVER_TAG);
         return 0;
     }
 
@@ -38,6 +39,9 @@ HANDLE UMInjectionHandler::getProcessId(UNICODE_STRING processName)
         }
     }
 
+    if (pBuf)
+        ExFreePoolWithTag(pBuf, DRIVER_TAG);
+
     return 0;
 }
 
@@ -45,13 +49,14 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
 {
     auto status = STATUS_SUCCESS;
     HANDLE pid = PsGetProcessId(pProcess);
-    PSYSTEM_PROCESS_INFO pInfo = (PSYSTEM_PROCESS_INFO)ExAllocatePoolWithTag(NonPagedPool, 1024 * 1024, DRIVER_TAG);
+    PVOID pBuf = ExAllocatePoolWithTag(NonPagedPool, 1024 * 1024, DRIVER_TAG);
+    PSYSTEM_PROCESS_INFO pInfo = (PSYSTEM_PROCESS_INFO)pBuf;
 
     ASSERT(ppThread != NULL);
     if (ppThread == NULL)
         return STATUS_INVALID_PARAMETER;
 
-    if (!pInfo)
+    if (!pBuf)
     {
         DbgPrint("UMInjectionHandler: %s: Failed to allocate memory for process list\n", __FUNCTION__);
         return STATUS_NO_MEMORY;
@@ -60,7 +65,7 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
     status = ZwQuerySystemInformation(SystemProcessInformation, pInfo, 1024 * 1024, NULL);
     if (!NT_SUCCESS(status))
     {
-        ExFreePoolWithTag(pInfo, DRIVER_TAG);
+        ExFreePoolWithTag(pBuf, DRIVER_TAG);
         return status;
     }
 
@@ -115,8 +120,8 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
     else
         DbgPrint("UMInjectionHandler: %s: Failed to locate process\n", __FUNCTION__);
 
-    if (pInfo)
-        ExFreePoolWithTag(pInfo, DRIVER_TAG);
+    if (pBuf)
+        ExFreePoolWithTag(pBuf, DRIVER_TAG);
 
     // No suitable thread found.
     if (!*ppThread)
