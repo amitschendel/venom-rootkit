@@ -23,15 +23,13 @@ namespace UMInjectionHandler {
 			OUT PULONG ReturnLength OPTIONAL
 		);
 
-	// Checks if the thread is valid for APC injection (Taken from BB Rootkit).
-	bool shouldSkipThread(PETHREAD pThread, BOOLEAN isWow64);
-
-	// Gets the first valid thread for apc injection from the given process (Taken from BB Rootkit).
+	// Gets the first valid thread for apc injection from the given process.
 	NTSTATUS getProcessThread(PEPROCESS pProcess, PETHREAD* ppThread);
 
-	// Find process id by name
+	// Find process id by name.
 	HANDLE getProcessId(UNICODE_STRING processName);
 
+	// Inject dll to the given process by using APC injection.
 	NTSTATUS injectDll(ULONG pid);
 
 }

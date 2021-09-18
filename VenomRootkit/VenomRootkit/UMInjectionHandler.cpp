@@ -21,16 +21,14 @@ HANDLE UMInjectionHandler::getProcessId(UNICODE_STRING processName)
         return 0;
     }
 
-    // Find target thread
     if (NT_SUCCESS(status))
     {
         status = STATUS_NOT_FOUND;
         for (;;)
         {
-            DbgPrint("The image name is: %wZ", pInfo->ImageName);
             if (RtlEqualUnicodeString(&pInfo->ImageName, &processName, TRUE))
             {
-                DbgPrint("The pid is %p", pInfo->UniqueProcessId);
+                DbgPrint("The pid is %lu", HandleToUlong(pInfo->UniqueProcessId));
                 return pInfo->UniqueProcessId;
                 break;
             }
@@ -44,51 +42,11 @@ HANDLE UMInjectionHandler::getProcessId(UNICODE_STRING processName)
     return 0;
 }
 
-bool UMInjectionHandler::shouldSkipThread(PETHREAD pThread, BOOLEAN isWow64)
-{
-    PUCHAR pTeb64 = reinterpret_cast<PUCHAR>(PsGetThreadTeb(pThread));
-    if (!pTeb64)
-        return TRUE;
-
-    // Skip GUI treads. APC to GUI thread causes ZwUserGetMessage to fail
-    // TEB64 + 0x78  = Win32ThreadInfo
-    if (*(PULONG64)(pTeb64 + 0x78) != 0)
-        return TRUE;
-
-    // Skip threads with no ActivationContext
-    // Skip threads with no TLS pointer
-    if (isWow64)
-    {
-        PUCHAR pTeb32 = pTeb64 + 0x2000;
-
-        // TEB32 + 0x1A8 = ActivationContextStackPointer
-        if (*(PULONG32)(pTeb32 + 0x1A8) == 0)
-            return TRUE;
-
-        // TEB64 + 0x2C = ThreadLocalStoragePointer
-        if (*(PULONG32)(pTeb32 + 0x2C) == 0)
-            return TRUE;
-    }
-    else
-    {
-        // TEB64 + 0x2C8 = ActivationContextStackPointer
-        if (*(PULONG64)(pTeb64 + 0x2C8) == 0)
-            return TRUE;
-
-        // TEB64 + 0x58 = ThreadLocalStoragePointer
-        if (*(PULONG64)(pTeb64 + 0x58) == 0)
-            return TRUE;
-    }
-
-    return FALSE;
-}
-
 NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppThread)
 {
-    NTSTATUS status = STATUS_SUCCESS;
+    auto status = STATUS_SUCCESS;
     HANDLE pid = PsGetProcessId(pProcess);
-    PVOID pBuf = ExAllocatePoolWithTag(NonPagedPool, 1024 * 1024, DRIVER_TAG);
-    PSYSTEM_PROCESS_INFO pInfo = (PSYSTEM_PROCESS_INFO)pBuf;
+    PSYSTEM_PROCESS_INFO pInfo = (PSYSTEM_PROCESS_INFO)ExAllocatePoolWithTag(NonPagedPool, 1024 * 1024, DRIVER_TAG);
 
     ASSERT(ppThread != NULL);
     if (ppThread == NULL)
@@ -100,15 +58,14 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
         return STATUS_NO_MEMORY;
     }
 
-    // Get the process thread list
     status = ZwQuerySystemInformation(SystemProcessInformation, pInfo, 1024 * 1024, NULL);
     if (!NT_SUCCESS(status))
     {
-        ExFreePoolWithTag(pBuf, DRIVER_TAG);
+        ExFreePoolWithTag(pInfo, DRIVER_TAG);
         return status;
     }
 
-    // Find target thread
+    // Find the target process.
     if (NT_SUCCESS(status))
     {
         status = STATUS_NOT_FOUND;
@@ -126,32 +83,26 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
         }
     }
 
-    BOOLEAN wow64 = PsGetProcessWow64Process(pProcess) != NULL;
+    BOOLEAN isWow64 = PsGetProcessWow64Process(pProcess) != NULL;
 
-    // Reference target thread
+    // Reference target thread.
     if (NT_SUCCESS(status))
     {
         status = STATUS_NOT_FOUND;
 
-        // Get first thread
+        // Get first valid thread.
         for (ULONG i = 0; i < pInfo->NumberOfThreads; i++)
         {
-            // Skip current thread
-            if (/*pInfo->Threads[i].WaitReason == Suspended ||
-                 pInfo->Threads[i].ThreadState == 5 ||*/
-                pInfo->Threads[i].ClientId.UniqueThread == PsGetCurrentThreadId())
-            {
+            // Skip current thread.
+            if (pInfo->Threads[i].ClientId.UniqueThread == PsGetCurrentThreadId())
                 continue;
-            }
 
             status = PsLookupThreadByThreadId(pInfo->Threads[i].ClientId.UniqueThread, ppThread);
 
-            // Skip specific threads
-            //
-            //if (*ppThread && shouldSkipThread(*ppThread, wow64))
+            // Skip specific threads.
             if (*ppThread)
             {
-                if (wow64 || PsIsProtectedProcess(pProcess))
+                if (isWow64 || PsIsProtectedProcess(pProcess))
                 {
                     ObDereferenceObject(*ppThread);
                     *ppThread = NULL;
@@ -163,12 +114,12 @@ NTSTATUS UMInjectionHandler::getProcessThread(PEPROCESS pProcess, PETHREAD* ppTh
         }
     }
     else
-        DbgPrint("BlackBone: %s: Failed to locate process\n", __FUNCTION__);
+        DbgPrint("UMInjectionHandler: %s: Failed to locate process\n", __FUNCTION__);
 
-    if (pBuf)
-        ExFreePoolWithTag(pBuf, DRIVER_TAG);
+    if (pInfo)
+        ExFreePoolWithTag(pInfo, DRIVER_TAG);
 
-    // No suitable thread
+    // No suitable thread found.
     if (!*ppThread)
         status = STATUS_NOT_FOUND;
 

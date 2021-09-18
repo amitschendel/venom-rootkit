@@ -153,7 +153,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="CommunicationHandler.cpp" />
+    <ClCompile Include="VenomClient.cpp" />
+    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="VenomCommands.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CommunicationHandler.h" />
+    <ClInclude Include="Utils.h" />
+    <ClInclude Include="VenomClient.h" />
+    <ClInclude Include="VenomCommands.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

