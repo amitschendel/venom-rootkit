@@ -3,7 +3,7 @@ A simple windows rootkit that I have wrote, In order to explore a bit about the 
 The Venom rootkit uses a few well known methods that are commonly being used by other famous rootkits. Some of the main features are listed in the "Features" section later on.
 
 # Features
-- [x] Dynamic APC injection of user mode dll from kernel.
+- [x] Dynamic APC injection to load the UM dll.
 - [x] Process Hiding.
 - [x] Token elevation to "NT AUTHORITY\SYSTEM".
 - [ ] Command execution.
@@ -11,7 +11,8 @@ The Venom rootkit uses a few well known methods that are commonly being used by 
 - [ ] C&C server communication. 
 - [ ] Logging.
 - [ ] File hiding.
-- [ ] Anti VM/Debug.
+- [ ] Anti VM/Debug (Maybe implement through TLS callbacks).
+- [ ] Dynamic config for UM client.
 
 # Some other projects I have taken inspiration from
  - [BlackBone](https://github.com/DarthTon/Blackbone)
