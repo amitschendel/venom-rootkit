@@ -50,7 +50,6 @@ bool VenomCommands::executeCommand(const char* command, const char* output)
 	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(command, "r"), _pclose);
 
 	if (!pipe)
-		//Add a log: Error while opening pipe.
 		return 1;
 
 	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr)

