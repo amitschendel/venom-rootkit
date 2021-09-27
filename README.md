@@ -14,7 +14,7 @@ Then it performs the IRP hook over the nsiproxy driver. And then it performs an 
 - [x] Process Hiding.
 - [x] Token elevation to "NT AUTHORITY\SYSTEM".
 - [x] Command execution.
-- [x] TCP port hiding by hooking NSI.
+- [x] TCP port hiding by irp hooking nsiproxy driver.
 - [x] C&C server communication. 
 - [ ] Logging.
 - [ ] File hiding.
