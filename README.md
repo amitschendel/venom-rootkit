@@ -11,7 +11,7 @@ Then it performs the IRP hook over the nsiproxy driver. And then it performs an 
 
 # Demo
 Here is a little demo of the port hiding feature -
-![Port Hiding](https://imgur.com/f5Qtlf1)
+![Port Hiding](https://i.imgur.com/f5Qtlf1.png)
 
 * My C&C is only for the POC, my main goal was the rootkit so I invested the minimum I needed for the demo.
 
