@@ -33,3 +33,6 @@ Here is a little demo of the port hiding feature -
 
 # Thanks
 I want to thanks [@omerk2511](https://github.com/omerk2511) for helping and guiding.
+
+# Disclaimer
+This project is for educational purposes only, I am not responsible for any kind of abuse.
