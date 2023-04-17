@@ -3,6 +3,7 @@
 #include <ntifs.h>
 
 #include "../Config.h"
+#include "Utils.h"
 
 template <typename T, POOL_TYPE poolType, ULONG poolTag = POOL_TAG>
 class UniquePtr {
@@ -21,9 +22,8 @@ public:
 
     UniquePtr& operator=(const UniquePtr&) = delete;
 
-    UniquePtr(UniquePtr&& other) noexcept : m_ptr(other.m_ptr) {
-        other.m_ptr = nullptr;
-    }
+    UniquePtr(UniquePtr&& other) noexcept
+        : m_ptr(std::exchange(other.m_ptr, nullptr)) {}
 
     UniquePtr& operator=(UniquePtr&& other) noexcept {
         if (this != &other) {
@@ -31,8 +31,7 @@ public:
                 ExFreePoolWithTag(m_ptr, poolTag);
             }
 
-            m_ptr = other.m_ptr;
-            other.m_ptr = nullptr;
+            m_ptr = std::exchange(other.m_ptr, nullptr);
         }
         return *this;
     }
@@ -50,12 +49,10 @@ public:
     }
 
     T* release() {
-        const auto tmp = m_ptr;
-        m_ptr = nullptr;
-        return tmp;
+        return std::exchange(m_ptr, nullptr);
     }
 
-    void reset(T* p = nullptr) {
+    void reset(T* ptr = nullptr) {
         if (m_ptr) {
             ExFreePoolWithTag(m_ptr, poolTag);
         }

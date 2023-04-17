@@ -153,6 +153,7 @@
     <ClCompile Include="FastMutex.cpp" />
     <ClCompile Include="IoctlHandlers.cpp" />
     <ClCompile Include="NetworkHandler.cpp" />
+    <ClCompile Include="Process.cpp" />
     <ClCompile Include="ShellcodeHandler.cpp" />
     <ClCompile Include="TokenHandler.cpp" />
     <ClCompile Include="UMInjectionHandler.cpp" />
@@ -164,9 +165,13 @@
     <ClInclude Include="FastMutex.h" />
     <ClInclude Include="Ioctl.h" />
     <ClInclude Include="IoctlHandlers.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="lib\UniquePtr.h" />
+    <ClInclude Include="lib\Utils.h" />
     <ClInclude Include="NativeStructs.h" />
     <ClInclude Include="NetworkHandler.h" />
     <ClCompile Include="ProcHandler.cpp" />
+    <ClInclude Include="Process.h" />
     <ClInclude Include="ProcHandler.h" />
     <ClInclude Include="ShellcodeHandler.h" />
     <ClInclude Include="TokenHandler.h" />
