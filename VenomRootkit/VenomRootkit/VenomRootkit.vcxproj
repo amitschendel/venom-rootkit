@@ -154,6 +154,7 @@
     <ClCompile Include="IoctlHandlers.cpp" />
     <ClCompile Include="NetworkHandler.cpp" />
     <ClCompile Include="Process.cpp" />
+    <ClCompile Include="Capabilities\ProcessCapabilities\ProcessHider.cpp" />
     <ClCompile Include="ShellcodeHandler.cpp" />
     <ClCompile Include="TokenHandler.cpp" />
     <ClCompile Include="UMInjectionHandler.cpp" />
@@ -162,6 +163,7 @@
   <ItemGroup>
     <ClInclude Include="ApcHandler.h" />
     <ClInclude Include="AutoLock.h" />
+    <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h" />
     <ClInclude Include="FastMutex.h" />
     <ClInclude Include="Ioctl.h" />
     <ClInclude Include="IoctlHandlers.h" />
@@ -172,6 +174,7 @@
     <ClInclude Include="NetworkHandler.h" />
     <ClCompile Include="ProcHandler.cpp" />
     <ClInclude Include="Process.h" />
+    <ClInclude Include="Capabilities\ProcessCapabilities\ProcessHider.h" />
     <ClInclude Include="ProcHandler.h" />
     <ClInclude Include="ShellcodeHandler.h" />
     <ClInclude Include="TokenHandler.h" />

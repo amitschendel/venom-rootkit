@@ -49,6 +49,9 @@
     <ClCompile Include="Process.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Capabilities\ProcessCapabilities\ProcessHider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Venom.h">
@@ -97,6 +100,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Capabilities\ProcessCapabilities\ProcessHider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
