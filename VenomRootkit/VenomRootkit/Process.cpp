@@ -9,7 +9,7 @@ Process::Process(ULONG pid) noexcept : m_process(nullptr) {
 
 Process::~Process() {
     if (m_process) {
-        ObDereferenceObject(reinterpret_cast<PVOID>(m_process));
+        ObDereferenceObject(m_process);
     }
 }
 

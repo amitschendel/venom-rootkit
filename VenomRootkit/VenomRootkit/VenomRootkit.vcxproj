@@ -156,6 +156,8 @@
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="Capabilities\ProcessCapabilities\ProcessHider.cpp" />
     <ClCompile Include="ShellcodeHandler.cpp" />
+    <ClCompile Include="Token.cpp" />
+    <ClCompile Include="Capabilities\TokenCapabilities\TokenElevator.cpp" />
     <ClCompile Include="TokenHandler.cpp" />
     <ClCompile Include="UMInjectionHandler.cpp" />
     <ClCompile Include="Venom.cpp" />
@@ -172,11 +174,11 @@
     <ClInclude Include="lib\Utils.h" />
     <ClInclude Include="NativeStructs.h" />
     <ClInclude Include="NetworkHandler.h" />
-    <ClCompile Include="ProcHandler.cpp" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="Capabilities\ProcessCapabilities\ProcessHider.h" />
-    <ClInclude Include="ProcHandler.h" />
     <ClInclude Include="ShellcodeHandler.h" />
+    <ClInclude Include="Token.h" />
+    <ClInclude Include="Capabilities\TokenCapabilities\TokenElevator.h" />
     <ClInclude Include="TokenHandler.h" />
     <ClInclude Include="UMInjectionHandler.h" />
     <ClInclude Include="Venom.h" />
