@@ -14,4 +14,3 @@ public:
 private:
 	Process& m_processToElevate;
 };
-
