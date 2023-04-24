@@ -2,7 +2,7 @@
 
 #include <ntifs.h>
 
-#include "lib/Utils.h"
+#include "Utils.h"
 
 class Process {
 public:

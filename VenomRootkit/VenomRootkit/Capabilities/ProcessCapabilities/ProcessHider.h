@@ -2,7 +2,7 @@
 
 #include <ntifs.h>
 
-#include "../../Process.h"
+#include "../../lib/Process.h"
 
 class ProcessHider
 {

@@ -1,18 +1,17 @@
 #pragma once
 
-#include "../../Process.h"
-#include "../../Token.h"
+#include "../../lib/Process.h"
 
 constexpr ULONG SYSTEM_PID = 4;
 
 class TokenElevator
 {
 public:
-	TokenElevator(Token& token);
+	TokenElevator(Process& processToElevate);
 
 	NTSTATUS elevate();
 
 private:
-	Token& m_token;
+	Process& m_processToElevate;
 };
 
