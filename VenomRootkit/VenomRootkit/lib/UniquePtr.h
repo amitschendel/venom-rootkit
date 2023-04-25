@@ -48,10 +48,6 @@ public:
         return m_ptr;
     }
 
-    T* release() {
-        return std::exchange(m_ptr, nullptr);
-    }
-
     void reset(T* ptr = nullptr) {
         if (m_ptr) {
             ExFreePoolWithTag(m_ptr, poolTag);

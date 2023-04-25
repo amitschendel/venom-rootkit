@@ -150,14 +150,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApcHandler.cpp" />
+    <ClCompile Include="Capabilities\InjectionCapabilities\APCInjector.cpp" />
     <ClCompile Include="FastMutex.cpp" />
     <ClCompile Include="IoctlHandlers.cpp" />
+    <ClCompile Include="lib\Alloc.cpp" />
     <ClCompile Include="NetworkHandler.cpp" />
     <ClCompile Include="lib\Process.cpp" />
     <ClCompile Include="Capabilities\ProcessCapabilities\ProcessHider.cpp" />
     <ClCompile Include="ShellcodeHandler.cpp" />
-    <ClCompile Include="Token.cpp" />
     <ClCompile Include="Capabilities\TokenCapabilities\TokenElevator.cpp" />
+    <ClCompile Include="lib\Thread.cpp" />
     <ClCompile Include="UMInjectionHandler.cpp" />
     <ClCompile Include="Venom.cpp" />
   </ItemGroup>
@@ -166,19 +168,25 @@
     <ClInclude Include="AutoLock.h" />
     <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h" />
     <ClInclude Include="Capabilities\TokenCapabilities\Offsets.h" />
+    <ClInclude Include="Capabilities\InjectionCapabilities\APCInjector.h" />
     <ClInclude Include="FastMutex.h" />
     <ClInclude Include="Ioctl.h" />
     <ClInclude Include="IoctlHandlers.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="lib\Alloc.h" />
+    <ClInclude Include="lib\Buffer.h" />
+    <ClInclude Include="lib\Memory.h" />
+    <ClInclude Include="lib\Symbols.h" />
     <ClInclude Include="lib\UniquePtr.h" />
     <ClInclude Include="lib\Utils.h" />
+    <ClInclude Include="lib\Vector.h" />
     <ClInclude Include="NativeStructs.h" />
     <ClInclude Include="NetworkHandler.h" />
     <ClInclude Include="lib\Process.h" />
     <ClInclude Include="Capabilities\ProcessCapabilities\ProcessHider.h" />
     <ClInclude Include="ShellcodeHandler.h" />
-    <ClInclude Include="Token.h" />
     <ClInclude Include="Capabilities\TokenCapabilities\TokenElevator.h" />
+    <ClInclude Include="lib\Thread.h" />
     <ClInclude Include="UMInjectionHandler.h" />
     <ClInclude Include="Venom.h" />
   </ItemGroup>

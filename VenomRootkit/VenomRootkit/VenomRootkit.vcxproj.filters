@@ -46,10 +46,16 @@
     <ClCompile Include="Capabilities\ProcessCapabilities\ProcessHider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Token.cpp">
+    <ClCompile Include="Capabilities\TokenCapabilities\TokenElevator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Capabilities\TokenCapabilities\TokenElevator.cpp">
+    <ClCompile Include="Capabilities\InjectionCapabilities\APCInjector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Alloc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -102,13 +108,31 @@
     <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Token.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Capabilities\TokenCapabilities\TokenElevator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Capabilities\TokenCapabilities\Offsets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Capabilities\InjectionCapabilities\APCInjector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Symbols.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Alloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

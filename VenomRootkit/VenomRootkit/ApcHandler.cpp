@@ -3,14 +3,15 @@
 
 void ApcHandler::kernelFreeKapc(PKAPC apc, PKNORMAL_ROUTINE*, PVOID*, PVOID*, PVOID*)
 {
-	ExFreePoolWithTag(apc, DRIVER_TAG);
-
+	//ExFreePoolWithTag(apc, DRIVER_TAG);
+	UNREFERENCED_PARAMETER(apc);
 	::ExReleaseRundownProtection(&g_rundown_protection);
 }
 
 void ApcHandler::rundownFreeKapc(PKAPC apc)
 {
-	ExFreePoolWithTag(apc, DRIVER_TAG);
+	UNREFERENCED_PARAMETER(apc);
+	//ExFreePoolWithTag(apc, DRIVER_TAG);
 
 	::ExReleaseRundownProtection(&g_rundown_protection);
 }

