@@ -1,5 +1,6 @@
 #include "Symbols.h"
 #include "Memory.h"
+#include "UniquePtr.h"
 #include "../Config.h"
 #include "Process.h"
 
@@ -12,15 +13,17 @@ Process::Process(ULONG pid) noexcept : m_process(nullptr) {
 
 Process::Process(UNICODE_STRING processName) noexcept : m_process(nullptr) {
     auto status = STATUS_SUCCESS;
-    const auto processInformation = std::make_unique<SYSTEM_PROCESS_INFO, PagedPool, POOL_TAG>();
+    ULONG bytesToAllocate = 0;
 
-    ULONG bytesToAllocate;
     status = ZwQuerySystemInformation(SystemProcessInformation, nullptr, NULL, &bytesToAllocate);
-    if (!NT_SUCCESS(status)){
+    if (status != STATUS_INFO_LENGTH_MISMATCH){
         m_process = nullptr;
     }
 
-    status = ZwQuerySystemInformation(SystemProcessInformation, processInformation.get(), bytesToAllocate, NULL);
+    const auto processInformation = UniquePtr<SYSTEM_PROCESS_INFO, PagedPool, POOL_TAG>(
+        reinterpret_cast<PSYSTEM_PROCESS_INFO>(ExAllocatePoolWithTag(PagedPool, bytesToAllocate, POOL_TAG)));
+
+    status = ZwQuerySystemInformation(SystemProcessInformation, processInformation.get(), bytesToAllocate, &bytesToAllocate);
     if (!NT_SUCCESS(status)) {
         m_process = nullptr;
     }

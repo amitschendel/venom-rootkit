@@ -149,7 +149,7 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ApcHandler.cpp" />
+    <ClCompile Include="lib\Apc.cpp" />
     <ClCompile Include="Capabilities\InjectionCapabilities\APCInjector.cpp" />
     <ClCompile Include="FastMutex.cpp" />
     <ClCompile Include="IoctlHandlers.cpp" />
@@ -160,11 +160,10 @@
     <ClCompile Include="ShellcodeHandler.cpp" />
     <ClCompile Include="Capabilities\TokenCapabilities\TokenElevator.cpp" />
     <ClCompile Include="lib\Thread.cpp" />
-    <ClCompile Include="UMInjectionHandler.cpp" />
     <ClCompile Include="Venom.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ApcHandler.h" />
+    <ClInclude Include="lib\Apc.h" />
     <ClInclude Include="AutoLock.h" />
     <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h" />
     <ClInclude Include="Capabilities\TokenCapabilities\Offsets.h" />
@@ -187,7 +186,6 @@
     <ClInclude Include="ShellcodeHandler.h" />
     <ClInclude Include="Capabilities\TokenCapabilities\TokenElevator.h" />
     <ClInclude Include="lib\Thread.h" />
-    <ClInclude Include="UMInjectionHandler.h" />
     <ClInclude Include="Venom.h" />
   </ItemGroup>
   <ItemGroup>

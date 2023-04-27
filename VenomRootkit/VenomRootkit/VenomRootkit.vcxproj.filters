@@ -31,13 +31,7 @@
     <ClCompile Include="FastMutex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ApcHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ShellcodeHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UMInjectionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lib\Process.cpp">
@@ -56,6 +50,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lib\Alloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Apc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -78,13 +75,7 @@
     <ClInclude Include="AutoLock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ApcHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ShellcodeHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UMInjectionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NativeStructs.h">
@@ -133,6 +124,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\Buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Apc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

