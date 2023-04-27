@@ -57,7 +57,7 @@ NTSTATUS APCInjector::queueKernelApc() {
     }
 
     const auto injectableThread = Thread(threadId);
-    auto kernelApc = Apc(&normalRoutine, injectableThread, OriginalApcEnvironment, KernelMode);
+    auto kernelApc = Apc(normalRoutine, injectableThread, OriginalApcEnvironment, KernelMode);
     if (kernelApc.queue()) {
         return STATUS_SUCCESS;
     }
