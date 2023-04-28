@@ -2,6 +2,7 @@
 
 #include <ntifs.h>
 
+#include "Shellcode.h"
 #include "../../lib/Process.h"
 #include "../../lib/Thread.h"
 #include "../../lib/Buffer.h"
@@ -10,7 +11,7 @@
 class APCInjector
 {
 public:
-	APCInjector(Process& process, NonPagedBuffer& shellcode);
+	APCInjector(Process& process);
 
 	NTSTATUS inject();
 
@@ -29,5 +30,4 @@ private:
 	static void normalRoutine(PVOID, PVOID, PVOID);
 
 	Process& m_process;
-	NonPagedBuffer& m_shellcode;
 };

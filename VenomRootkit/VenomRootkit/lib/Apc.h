@@ -5,7 +5,6 @@
 #include "Symbols.h"
 #include "Utils.h"
 #include "Memory.h"
-#include "../../ShellcodeHandler.h"
 #include "UniquePtr.h"
 #include "Thread.h"
 
@@ -25,7 +24,6 @@ private:
 	static void rundownFreeApc(PKAPC);
 	static void kernelFreeApc(PKAPC, PKNORMAL_ROUTINE*, PVOID*, PVOID*, PVOID*);
 
-	inline static EX_RUNDOWN_REF m_rundownProtection;
 	UniquePtr<KAPC, NonPagedPool> m_apc;
 	PKNORMAL_ROUTINE m_normalRoutineAdress;
 };

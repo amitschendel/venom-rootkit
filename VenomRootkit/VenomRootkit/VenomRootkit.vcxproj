@@ -157,12 +157,12 @@
     <ClCompile Include="NetworkHandler.cpp" />
     <ClCompile Include="lib\Process.cpp" />
     <ClCompile Include="Capabilities\ProcessCapabilities\ProcessHider.cpp" />
-    <ClCompile Include="ShellcodeHandler.cpp" />
     <ClCompile Include="Capabilities\TokenCapabilities\TokenElevator.cpp" />
     <ClCompile Include="lib\Thread.cpp" />
     <ClCompile Include="Venom.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Capabilities\InjectionCapabilities\Shellcode.h" />
     <ClInclude Include="lib\Apc.h" />
     <ClInclude Include="AutoLock.h" />
     <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h" />
@@ -183,13 +183,12 @@
     <ClInclude Include="NetworkHandler.h" />
     <ClInclude Include="lib\Process.h" />
     <ClInclude Include="Capabilities\ProcessCapabilities\ProcessHider.h" />
-    <ClInclude Include="ShellcodeHandler.h" />
     <ClInclude Include="Capabilities\TokenCapabilities\TokenElevator.h" />
     <ClInclude Include="lib\Thread.h" />
     <ClInclude Include="Venom.h" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="shellcode.asm">
+    <MASM Include="Capabilities\InjectionCapabilities\shellcode.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </MASM>

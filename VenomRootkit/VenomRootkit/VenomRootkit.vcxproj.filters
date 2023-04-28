@@ -31,9 +31,6 @@
     <ClCompile Include="FastMutex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShellcodeHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lib\Process.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -73,9 +70,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AutoLock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellcodeHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NativeStructs.h">
@@ -129,9 +123,12 @@
     <ClInclude Include="lib\Apc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Capabilities\InjectionCapabilities\Shellcode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="shellcode.asm">
+    <MASM Include="Capabilities\InjectionCapabilities\shellcode.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>
