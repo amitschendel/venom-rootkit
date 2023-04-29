@@ -1,5 +1,5 @@
 #pragma once
-#include <Ntifs.h>
+#include <ntifs.h>
 
 namespace IoctlHandlers {
 

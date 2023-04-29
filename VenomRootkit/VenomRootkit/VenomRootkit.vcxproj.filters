@@ -25,9 +25,6 @@
     <ClCompile Include="IoctlHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NetworkHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FastMutex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -52,6 +49,9 @@
     <ClCompile Include="lib\Apc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Capabilities\NetworkCapabilites\PortHider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Venom.h">
@@ -63,16 +63,10 @@
     <ClInclude Include="IoctlHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FastMutex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AutoLock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NativeStructs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\Process.h">
@@ -124,6 +118,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Capabilities\InjectionCapabilities\Shellcode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Capabilities\NetworkCapabilites\PortHider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

