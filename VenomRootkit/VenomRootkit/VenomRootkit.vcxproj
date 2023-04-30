@@ -151,7 +151,6 @@
   <ItemGroup>
     <ClCompile Include="lib\Apc.cpp" />
     <ClCompile Include="Capabilities\InjectionCapabilities\APCInjector.cpp" />
-    <ClCompile Include="FastMutex.cpp" />
     <ClCompile Include="IoctlHandlers.cpp" />
     <ClCompile Include="lib\Alloc.cpp" />
     <ClCompile Include="lib\Process.cpp" />
@@ -164,11 +163,9 @@
   <ItemGroup>
     <ClInclude Include="Capabilities\InjectionCapabilities\Shellcode.h" />
     <ClInclude Include="lib\Apc.h" />
-    <ClInclude Include="AutoLock.h" />
     <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h" />
     <ClInclude Include="Capabilities\TokenCapabilities\Offsets.h" />
     <ClInclude Include="Capabilities\InjectionCapabilities\APCInjector.h" />
-    <ClInclude Include="FastMutex.h" />
     <ClInclude Include="Ioctl.h" />
     <ClInclude Include="IoctlHandlers.h" />
     <ClInclude Include="Config.h" />
