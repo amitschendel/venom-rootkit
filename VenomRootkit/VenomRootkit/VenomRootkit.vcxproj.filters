@@ -25,25 +25,28 @@
     <ClCompile Include="IoctlHandlers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TokenHandler.cpp">
+    <ClCompile Include="lib\Process.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NetworkHandler.cpp">
+    <ClCompile Include="Capabilities\ProcessCapabilities\ProcessHider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FastMutex.cpp">
+    <ClCompile Include="Capabilities\TokenCapabilities\TokenElevator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProcHandler.cpp">
+    <ClCompile Include="Capabilities\InjectionCapabilities\APCInjector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ApcHandler.cpp">
+    <ClCompile Include="lib\Thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShellcodeHandler.cpp">
+    <ClCompile Include="lib\Alloc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UMInjectionHandler.cpp">
+    <ClCompile Include="lib\Apc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Capabilities\NetworkCapabilites\PortHider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -57,36 +60,63 @@
     <ClInclude Include="IoctlHandlers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TokenHandler.h">
+    <ClInclude Include="lib\Process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ProcHandler.h">
+    <ClInclude Include="lib\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkHandler.h">
+    <ClInclude Include="lib\UniquePtr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FastMutex.h">
+    <ClInclude Include="Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AutoLock.h">
+    <ClInclude Include="Capabilities\ProcessCapabilities\ProcessHider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ApcHandler.h">
+    <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShellcodeHandler.h">
+    <ClInclude Include="Capabilities\TokenCapabilities\TokenElevator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UMInjectionHandler.h">
+    <ClInclude Include="Capabilities\TokenCapabilities\Offsets.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NativeStructs.h">
+    <ClInclude Include="Capabilities\InjectionCapabilities\APCInjector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Symbols.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Alloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Apc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Capabilities\InjectionCapabilities\Shellcode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Capabilities\NetworkCapabilites\PortHider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="shellcode.asm">
+    <MASM Include="Capabilities\InjectionCapabilities\shellcode.asm">
       <Filter>Source Files</Filter>
     </MASM>
   </ItemGroup>

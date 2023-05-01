@@ -149,32 +149,42 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ApcHandler.cpp" />
-    <ClCompile Include="FastMutex.cpp" />
+    <ClCompile Include="lib\Apc.cpp" />
+    <ClCompile Include="Capabilities\InjectionCapabilities\APCInjector.cpp" />
     <ClCompile Include="IoctlHandlers.cpp" />
-    <ClCompile Include="NetworkHandler.cpp" />
-    <ClCompile Include="ShellcodeHandler.cpp" />
-    <ClCompile Include="TokenHandler.cpp" />
-    <ClCompile Include="UMInjectionHandler.cpp" />
+    <ClCompile Include="lib\Alloc.cpp" />
+    <ClCompile Include="lib\Process.cpp" />
+    <ClCompile Include="Capabilities\ProcessCapabilities\ProcessHider.cpp" />
+    <ClCompile Include="Capabilities\TokenCapabilities\TokenElevator.cpp" />
+    <ClCompile Include="lib\Thread.cpp" />
+    <ClCompile Include="Capabilities\NetworkCapabilites\PortHider.cpp" />
     <ClCompile Include="Venom.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ApcHandler.h" />
-    <ClInclude Include="AutoLock.h" />
-    <ClInclude Include="FastMutex.h" />
+    <ClInclude Include="Capabilities\InjectionCapabilities\Shellcode.h" />
+    <ClInclude Include="lib\Apc.h" />
+    <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h" />
+    <ClInclude Include="Capabilities\TokenCapabilities\Offsets.h" />
+    <ClInclude Include="Capabilities\InjectionCapabilities\APCInjector.h" />
     <ClInclude Include="Ioctl.h" />
     <ClInclude Include="IoctlHandlers.h" />
-    <ClInclude Include="NativeStructs.h" />
-    <ClInclude Include="NetworkHandler.h" />
-    <ClCompile Include="ProcHandler.cpp" />
-    <ClInclude Include="ProcHandler.h" />
-    <ClInclude Include="ShellcodeHandler.h" />
-    <ClInclude Include="TokenHandler.h" />
-    <ClInclude Include="UMInjectionHandler.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="lib\Alloc.h" />
+    <ClInclude Include="lib\Buffer.h" />
+    <ClInclude Include="lib\Memory.h" />
+    <ClInclude Include="lib\Symbols.h" />
+    <ClInclude Include="lib\UniquePtr.h" />
+    <ClInclude Include="lib\Utils.h" />
+    <ClInclude Include="lib\Vector.h" />
+    <ClInclude Include="lib\Process.h" />
+    <ClInclude Include="Capabilities\ProcessCapabilities\ProcessHider.h" />
+    <ClInclude Include="Capabilities\TokenCapabilities\TokenElevator.h" />
+    <ClInclude Include="lib\Thread.h" />
+    <ClInclude Include="Capabilities\NetworkCapabilites\PortHider.h" />
     <ClInclude Include="Venom.h" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="shellcode.asm">
+    <MASM Include="Capabilities\InjectionCapabilities\shellcode.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </MASM>

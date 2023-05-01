@@ -1,4 +1,5 @@
 #pragma once
+
 #include <ntifs.h>
 
 typedef enum _SYSTEM_INFORMATION_CLASS
@@ -215,3 +216,150 @@ typedef struct _SYSTEM_PROCESS_INFO
     LARGE_INTEGER OtherTransferCount;
     SYSTEM_THREAD_INFORMATION Threads[1];
 }SYSTEM_PROCESS_INFO, * PSYSTEM_PROCESS_INFO;
+
+EXTERN_C NTKERNELAPI PVOID NTAPI PsGetThreadTeb(PETHREAD Thread);
+
+EXTERN_C NTKERNELAPI PVOID NTAPI PsGetProcessWow64Process(PEPROCESS Process);
+
+EXTERN_C NTKERNELAPI BOOLEAN NTAPI PsIsProtectedProcess(PEPROCESS Process);
+
+EXTERN_C
+NTSYSAPI
+NTSTATUS
+NTAPI
+ZwQuerySystemInformation(
+	IN SYSTEM_INFORMATION_CLASS SystemInformationClass,
+	OUT PVOID SystemInformation,
+	IN ULONG SystemInformationLength,
+	OUT PULONG ReturnLength OPTIONAL
+);
+
+typedef enum _KAPC_ENVIRONMENT {
+    OriginalApcEnvironment,
+    AttachedApcEnvironment,
+    CurrentApcEnvironment,
+    InsertApcEnvironment
+} KAPC_ENVIRONMENT;
+
+typedef
+VOID
+(*PKNORMAL_ROUTINE) (
+    IN PVOID NormalContext,
+    IN PVOID SystemArgument1,
+    IN PVOID SystemArgument2
+    );
+
+typedef
+VOID
+(*PKKERNEL_ROUTINE) (
+    IN PKAPC Apc,
+    IN OUT PKNORMAL_ROUTINE* NormalRoutine,
+    IN OUT PVOID* NormalContext,
+    IN OUT PVOID* SystemArgument1,
+    IN OUT PVOID* SystemArgument2
+    );
+
+typedef
+VOID
+(*PKRUNDOWN_ROUTINE) (
+    IN  PKAPC Apc
+    );
+
+extern "C"
+VOID
+KeInitializeApc(
+    IN  PKAPC Apc,
+    IN  PKTHREAD Thread,
+    IN  KAPC_ENVIRONMENT Environment,
+    IN  PKKERNEL_ROUTINE KernelRoutine,
+    IN  PKRUNDOWN_ROUTINE RundownRoutine OPTIONAL,
+    IN  PKNORMAL_ROUTINE NormalRoutine OPTIONAL,
+    IN  KPROCESSOR_MODE ApcMode OPTIONAL,
+    IN  PVOID NormalContext OPTIONAL
+);
+
+extern "C"
+BOOLEAN
+KeInsertQueueApc(
+    IN  PKAPC Apc,
+    IN  PVOID SystemArgument1,
+    IN  PVOID SystemArgument2,
+    IN  KPRIORITY Increment
+);
+
+extern "C"
+NTSYSAPI
+NTSTATUS
+NTAPI
+ZwProtectVirtualMemory(
+    IN HANDLE ProcessHandle,
+    IN OUT PVOID * BaseAddress,
+    IN OUT PULONG NumberOfBytesToProtect,
+    IN ULONG NewAccessProtection,
+    OUT PULONG OldAccessProtection
+);
+
+extern "C"
+BOOLEAN
+KeTestAlertThread(
+    IN  KPROCESSOR_MODE AlertMode
+);
+
+extern "C" NTSYSAPI NTSTATUS NTAPI ObReferenceObjectByName(
+    PUNICODE_STRING ObjectName,
+    ULONG Attributes,
+    PACCESS_STATE AccessState,
+    ACCESS_MASK DesiredAccess,
+    POBJECT_TYPE ObjectType,
+    KPROCESSOR_MODE AccessMode,
+    PVOID ParseContext OPTIONAL,
+    PVOID * Object
+);
+
+extern "C" POBJECT_TYPE * IoDriverObjectType;
+
+typedef struct _NSI_STATUS_ENTRY
+{
+    ULONG dwState;
+    ULONG Unknown1;
+}NSI_STATUS_ENTRY, * PNSI_STATUS_ENTRY;
+
+typedef struct _NSI_PARAM
+{
+    ULONG_PTR UnknownParam1;
+    ULONG_PTR UnknownParam2;
+    ULONG_PTR UnknownParam3;
+    ULONG_PTR UnknownParam4;
+    ULONG_PTR UnknownParam5;
+    ULONG_PTR lpMem;
+    ULONG_PTR Protocol; // 0x38 Tcp or 0x1c Udp
+    ULONG_PTR UnknownParam8;
+    ULONG_PTR UnknownParam9;
+    ULONG_PTR lpStatus;
+    ULONG_PTR UnknownParam11;
+    ULONG_PTR UnknownParam12; //Process info
+    ULONG_PTR UnknownParam13;
+    ULONG_PTR ConnectionCount;
+}NSI_PARAM, * PNSI_PARAM;
+
+typedef struct _HP_CONTEXT
+{
+    PIO_COMPLETION_ROUTINE oldIocomplete;
+    PVOID oldCtx;
+    BOOLEAN bShouldInvolve;
+    PKPROCESS pcb;
+} HP_CONTEXT, * PHP_CONTEXT;
+
+typedef struct _INTERNAL_TCP_TABLE_SUBENTRY
+{
+    USHORT Unknown1;
+    USHORT Port;
+    ULONG dwIP;
+    UCHAR Unknown2[20];
+}INTERNAL_TCP_TABLE_SUBENTRY, * PINTERNAL_TCP_TABLE_SUBENTRY;
+
+typedef struct _INTERNAL_TCP_TABLE_ENTRY
+{
+    INTERNAL_TCP_TABLE_SUBENTRY localEntry;
+    INTERNAL_TCP_TABLE_SUBENTRY remoteEntry;
+} INTERNAL_TCP_TABLE_ENTRY, * PINTERNAL_TCP_TABLE_ENTRY;
