@@ -49,3 +49,6 @@ So stay tuned for some future changes, and feel free to contribute your own!
 
 # Thanks
 I want to thank [@omerk2511](https://github.com/omerk2511) for helping and guiding me.
+
+# Disclaimer
+This project is for educational purposes only, I am not responsible for any kind of abuse.
