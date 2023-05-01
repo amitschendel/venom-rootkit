@@ -35,7 +35,7 @@ A little demo of the port hiding feature.
 `sc create venom type= kernel binPath= {path_to_file} displayName= venom`
 `sc start venom`
 
-# Looking forward
+# Looking ahead
 There are many improvements to be made in each component, especially in the client and C&C that I just made for the POC.
 Currently, the client is very limited and static, so a lot to be made there.
 When looking at the rootkit itself in each capability there are better ways to achieve the goal.
