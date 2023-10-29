@@ -7,6 +7,8 @@
 #include "../../lib/Process.h"
 #include "../../lib/Memory.h"
 
+constexpr auto FILE_PREFIX = L"\\??\\C:\\"; //TODO: Support volumes.
+
 class FileDeleter
 {
 public:
@@ -16,7 +18,7 @@ public:
 
 private:
 	static NTSTATUS deletionCompleteRoutine(PDEVICE_OBJECT deviceObject, PIRP irp, PVOID context);
-	[[nodiscard]] NTSTATUS flushFileImageSection() const;
+	[[nodiscard]] NTSTATUS sendDeleteIrp() const;
 	[[nodiscard]] NTSTATUS closeOpenHandles() const;
 
 	PFILE_OBJECT m_fileObject;
