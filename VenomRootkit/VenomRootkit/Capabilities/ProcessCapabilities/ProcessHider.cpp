@@ -5,7 +5,7 @@ ProcessHider::ProcessHider(Process& process)
 	: m_process(process)
 {}
 
-NTSTATUS ProcessHider::hide() {
+NTSTATUS ProcessHider::hide() const {
     const auto activeProcessLinksAddress = reinterpret_cast<ULONG_PTR>(m_process.get()) + static_cast<ULONG>(Offsets::activeProcessLinks);
     const auto processListEntry = reinterpret_cast<PLIST_ENTRY>(activeProcessLinksAddress);
 
@@ -16,11 +16,8 @@ NTSTATUS ProcessHider::hide() {
 
     ExAcquirePushLockExclusive(listLock);
 
-    PLIST_ENTRY previous;
-    PLIST_ENTRY next;
-
-    previous = processListEntry->Blink;
-    next = processListEntry->Flink;
+    const auto previous = processListEntry->Blink;
+    const auto next = processListEntry->Flink;
 
     previous->Flink = next;
     next->Blink = previous;

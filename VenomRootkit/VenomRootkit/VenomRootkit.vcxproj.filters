@@ -49,6 +49,9 @@
     <ClCompile Include="Capabilities\NetworkCapabilites\PortHider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Capabilities\FileCapabilities\FileDeleter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Venom.h">
@@ -112,6 +115,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Capabilities\NetworkCapabilites\PortHider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Capabilities\FileCapabilities\FileDeleter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

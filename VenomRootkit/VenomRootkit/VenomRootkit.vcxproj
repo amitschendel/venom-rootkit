@@ -149,6 +149,7 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Capabilities\FileCapabilities\FileDeleter.cpp" />
     <ClCompile Include="lib\Apc.cpp" />
     <ClCompile Include="Capabilities\InjectionCapabilities\APCInjector.cpp" />
     <ClCompile Include="IoctlHandlers.cpp" />
@@ -162,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Capabilities\InjectionCapabilities\Shellcode.h" />
+    <ClInclude Include="Capabilities\FileCapabilities\FileDeleter.h" />
     <ClInclude Include="lib\Apc.h" />
     <ClInclude Include="Capabilities\ProcessCapabilities\Offsets.h" />
     <ClInclude Include="Capabilities\TokenCapabilities\Offsets.h" />

@@ -1,4 +1,5 @@
 #pragma once
+#pragma warning( disable : 4201)
 
 #include <ntifs.h>
 
@@ -217,6 +218,25 @@ typedef struct _SYSTEM_PROCESS_INFO
     SYSTEM_THREAD_INFORMATION Threads[1];
 }SYSTEM_PROCESS_INFO, * PSYSTEM_PROCESS_INFO;
 
+typedef struct _SYSTEM_HANDLE_TABLE_ENTRY_INFO
+{
+    USHORT UniqueProcessId;
+    USHORT CreatorBackTraceIndex;
+    UCHAR ObjectTypeIndex;
+    UCHAR HandleAttributes;
+    USHORT HandleValue;
+    PVOID Object;
+    ULONG GrantedAccess;
+} SYSTEM_HANDLE_TABLE_ENTRY_INFO, * PSYSTEM_HANDLE_TABLE_ENTRY_INFO;
+
+typedef struct _SYSTEM_HANDLE_INFORMATION
+{
+    ULONG NumberOfHandles;
+    SYSTEM_HANDLE_TABLE_ENTRY_INFO Handles[1];
+} SYSTEM_HANDLE_INFORMATION, * PSYSTEM_HANDLE_INFORMATION;
+
+extern "C" POBJECT_TYPE NTAPI ObGetObjectType(_In_ PVOID Object);
+
 EXTERN_C NTKERNELAPI PVOID NTAPI PsGetThreadTeb(PETHREAD Thread);
 
 EXTERN_C NTKERNELAPI PVOID NTAPI PsGetProcessWow64Process(PEPROCESS Process);
@@ -363,3 +383,193 @@ typedef struct _INTERNAL_TCP_TABLE_ENTRY
     INTERNAL_TCP_TABLE_SUBENTRY localEntry;
     INTERNAL_TCP_TABLE_SUBENTRY remoteEntry;
 } INTERNAL_TCP_TABLE_ENTRY, * PINTERNAL_TCP_TABLE_ENTRY;
+
+struct _MMSECTION_FLAGS
+{
+    ULONG BeingDeleted : 1;                                                   //0x0
+    ULONG BeingCreated : 1;                                                   //0x0
+    ULONG BeingPurged : 1;                                                    //0x0
+    ULONG NoModifiedWriting : 1;                                              //0x0
+    ULONG FailAllIo : 1;                                                      //0x0
+    ULONG Image : 1;                                                          //0x0
+    ULONG Based : 1;                                                          //0x0
+    ULONG File : 1;                                                           //0x0
+    ULONG AttemptingDelete : 1;                                               //0x0
+    ULONG PrefetchCreated : 1;                                                //0x0
+    ULONG PhysicalMemory : 1;                                                 //0x0
+    ULONG ImageControlAreaOnRemovableMedia : 1;                               //0x0
+    ULONG Reserve : 1;                                                        //0x0
+    ULONG Commit : 1;                                                         //0x0
+    ULONG NoChange : 1;                                                       //0x0
+    ULONG WasPurged : 1;                                                      //0x0
+    ULONG UserReference : 1;                                                  //0x0
+    ULONG GlobalMemory : 1;                                                   //0x0
+    ULONG DeleteOnClose : 1;                                                  //0x0
+    ULONG FilePointerNull : 1;                                                //0x0
+    ULONG PreferredNode : 6;                                                  //0x0
+    ULONG GlobalOnlyPerSession : 1;                                           //0x0
+    ULONG UserWritable : 1;                                                   //0x0
+    ULONG SystemVaAllocated : 1;                                              //0x0
+    ULONG PreferredFsCompressionBoundary : 1;                                 //0x0
+    ULONG UsingFileExtents : 1;                                               //0x0
+    ULONG PageSize64K : 1;                                                    //0x0
+};
+
+
+typedef struct _SECTION
+{
+    struct _RTL_BALANCED_NODE SectionNode;                                  //0x0
+    ULONGLONG StartingVpn;                                                  //0x18
+    ULONGLONG EndingVpn;                                                    //0x20
+    union
+    {
+        struct _CONTROL_AREA* ControlArea;                                  //0x28
+        struct _FILE_OBJECT* FileObject;                                    //0x28
+        ULONGLONG RemoteImageFileObject : 1;                                  //0x28
+        ULONGLONG RemoteDataFileObject : 1;                                   //0x28
+    } u1;                                                                   //0x28
+    ULONGLONG SizeOfSection;                                                //0x30
+    union
+    {
+        ULONG LongFlags;                                                    //0x38
+        struct _MMSECTION_FLAGS Flags;                                      //0x38
+    } u;                                                                    //0x38
+    ULONG InitialPageProtection : 12;                                         //0x3c
+    ULONG SessionId : 19;                                                     //0x3c
+    ULONG NoValidationNeeded : 1;                                             //0x3c
+} SECTION, * PSECTION;
+
+
+typedef struct _KLDR_DATA_TABLE_ENTRY
+{
+    struct _LIST_ENTRY InLoadOrderLinks;                                    //0x0
+    VOID* ExceptionTable;                                                   //0x10
+    ULONG ExceptionTableSize;                                               //0x18
+    VOID* GpValue;                                                          //0x20
+    struct _NON_PAGED_DEBUG_INFO* NonPagedDebugInfo;                        //0x28
+    VOID* DllBase;                                                          //0x30
+    VOID* EntryPoint;                                                       //0x38
+    ULONG SizeOfImage;                                                      //0x40
+    struct _UNICODE_STRING FullDllName;                                     //0x48
+    struct _UNICODE_STRING BaseDllName;                                     //0x58
+    ULONG Flags;                                                            //0x68
+    USHORT LoadCount;                                                       //0x6c
+    union
+    {
+        USHORT SignatureLevel : 4;                                            //0x6e
+        USHORT SignatureType : 3;                                             //0x6e
+        USHORT Unused : 9;                                                    //0x6e
+        USHORT EntireField;                                                 //0x6e
+    } u1;                                                                   //0x6e
+    VOID* SectionPointer;                                                   //0x70
+    ULONG CheckSum;                                                         //0x78
+    ULONG CoverageSectionSize;                                              //0x7c
+    VOID* CoverageSection;                                                  //0x80
+    VOID* LoadedImports;                                                    //0x88
+    VOID* Spare;                                                            //0x90
+    ULONG SizeOfImageNotRounded;                                            //0x98
+    ULONG TimeDateStamp;                                                    //0x9c
+}KLDR_DATA_TABLE_ENTRY, * PKLDR_DATA_TABLE_ENTRY;
+
+
+struct _EX_PUSH_LOCK
+{
+    union
+    {
+        struct
+        {
+            ULONGLONG Locked : 1;                                             //0x0
+            ULONGLONG Waiting : 1;                                            //0x0
+            ULONGLONG Waking : 1;                                             //0x0
+            ULONGLONG MultipleShared : 1;                                     //0x0
+            ULONGLONG Shared : 60;                                            //0x0
+        };
+        ULONGLONG Value;                                                    //0x0
+        VOID* Ptr;                                                          //0x0
+    };
+};
+
+struct _EX_FAST_REF
+{
+    union
+    {
+        VOID* Object;                                                       //0x0
+        ULONGLONG RefCnt : 4;                                                 //0x0
+        ULONGLONG Value;                                                    //0x0
+    };
+};
+
+struct _MMSECTION_FLAGS2
+{
+    USHORT PartitionId : 10;                                                  //0x0
+    UCHAR NoCrossPartitionAccess : 1;                                         //0x2
+    UCHAR SubsectionCrossPartitionReferenceOverflow : 1;                      //0x2
+};
+
+typedef struct _CONTROL_AREA
+{
+    struct _SEGMENT* Segment;                                               //0x0
+    union
+    {
+        struct _LIST_ENTRY ListHead;                                        //0x8
+        VOID* AweContext;                                                   //0x8
+    };
+    ULONGLONG NumberOfSectionReferences;                                    //0x18
+    ULONGLONG NumberOfPfnReferences;                                        //0x20
+    ULONGLONG NumberOfMappedViews;                                          //0x28
+    ULONGLONG NumberOfUserReferences;                                       //0x30
+    union
+    {
+        ULONG LongFlags;                                                    //0x38
+        struct _MMSECTION_FLAGS Flags;                                      //0x38
+    } u;                                                                    //0x38
+    union
+    {
+        ULONG LongFlags;                                                    //0x3c
+        struct _MMSECTION_FLAGS2 Flags;                                     //0x3c
+    } u1;                                                                   //0x3c
+    struct _EX_FAST_REF FilePointer;                                        //0x40
+    volatile LONG ControlAreaLock;                                          //0x48
+    ULONG ModifiedWriteCount;                                               //0x4c
+    struct _MI_CONTROL_AREA_WAIT_BLOCK* WaitList;                           //0x50
+    union
+    {
+        struct
+        {
+            union
+            {
+                ULONG NumberOfSystemCacheViews;                             //0x58
+                ULONG ImageRelocationStartBit;                              //0x58
+            };
+            union
+            {
+                volatile LONG WritableUserReferences;                       //0x5c
+                struct
+                {
+                    ULONG ImageRelocationSizeIn64k : 16;                      //0x5c
+                    ULONG SystemImage : 1;                                    //0x5c
+                    ULONG CantMove : 1;                                       //0x5c
+                    ULONG StrongCode : 2;                                     //0x5c
+                    ULONG BitMap : 2;                                         //0x5c
+                    ULONG ImageActive : 1;                                    //0x5c
+                    ULONG ImageBaseOkToReuse : 1;                             //0x5c
+                };
+            };
+            union
+            {
+                ULONG FlushInProgressCount;                                 //0x60
+                ULONG NumberOfSubsections;                                  //0x60
+                struct _MI_IMAGE_SECURITY_REFERENCE* SeImageStub;           //0x60
+            };
+        } e2;                                                               //0x58
+    } u2;                                                                   //0x58
+    struct _EX_PUSH_LOCK FileObjectLock;                                    //0x68
+    volatile ULONGLONG LockedPages;                                         //0x70
+    union
+    {
+        ULONGLONG IoAttributionContext : 61;                                  //0x78
+        ULONGLONG Spare : 3;                                                  //0x78
+        ULONGLONG ImageCrossPartitionCharge;                                //0x78
+        ULONGLONG CommittedPageCount : 36;                                    //0x78
+    } u3;                                                                   //0x78
+}CONTROL_AREA, * PCONTROL_AREA;

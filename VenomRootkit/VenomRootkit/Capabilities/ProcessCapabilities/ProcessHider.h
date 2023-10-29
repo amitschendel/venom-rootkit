@@ -9,7 +9,7 @@ class ProcessHider
 public:
 	ProcessHider(Process& process);
 
-	NTSTATUS hide();
+	NTSTATUS hide() const;;
 
 private:
 	Process& m_process;
