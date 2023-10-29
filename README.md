@@ -25,7 +25,7 @@ A little demo of the port hiding feature.
 - [x] Command execution.
 - [x] TCP port hiding by irp hooking nsiproxy driver.
 - [x] C&C server communication.
-- [ ] Deleting the driver and dll from the disk after loading (SOON).
+- [x] Deleting the driver and dll from the disk after loading.
 
 # Usage
 1. Drop the dll in `C:\hooking.dll`
