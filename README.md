@@ -16,7 +16,7 @@ Lastly, the Venom client connects back to the C&C server from which We can contr
 
 # Demo
 A little demo of the port hiding feature.
-![Port Hiding Demo](https://camo.githubusercontent.com/eeb97ea73446b3739615c14ee8ddf6d48636b2c26ac8938e4bd2e3cd08610e6f/68747470733a2f2f692e696d6775722e636f6d2f663551746c66312e706e67)
+![Port Hiding Demo](https://github.com/user-attachments/assets/bdccffa2-46c0-4eb8-a101-b7dc9effb1a2)
 
 # Features
 - [x] Dynamic APC injection to load the UM dll.
